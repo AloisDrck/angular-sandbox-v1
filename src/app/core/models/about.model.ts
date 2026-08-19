@@ -3,7 +3,7 @@ export interface About {
   bio: string
   location: string
   links: {
-    github: string
+    repoGit: string
     gitlab: string
     linkedin: string
   }
