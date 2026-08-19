@@ -41,14 +41,14 @@ describe('ThemeService', () => {
 
   it('applique la classe .dark sur documentElement en mode dark', () => {
     const service = setup('browser', 'dark')
-    TestBed.flushEffects()
+    TestBed.tick()
     expect(document.documentElement.classList.contains('dark')).toBe(true)
   })
 
   it("n'applique pas la classe .dark en mode light", () => {
     document.documentElement.classList.add('dark')
     const service = setup('browser', 'light')
-    TestBed.flushEffects()
+    TestBed.tick()
     expect(document.documentElement.classList.contains('dark')).toBe(false)
   })
 

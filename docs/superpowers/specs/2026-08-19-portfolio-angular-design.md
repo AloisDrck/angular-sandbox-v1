@@ -131,7 +131,7 @@ Un interceptor met `isLoading` à `true` au début de chaque requête HTTP et `f
       "description": "Description courte",
       "longDescription": "Description détaillée pour la page projet",
       "techs": ["Python", "FastAPI", "PostgreSQL"],
-      "github": "https://github.com/...",
+      "repoGit": "https://repoGit.com/...",
       "year": 2024,
       "type": "academic"
     }
@@ -159,7 +159,7 @@ Un interceptor met `isLoading` à `true` au début de chaque requête HTTP et `f
     "bio": "Courte présentation",
     "location": "Ville, Pays",
     "links": {
-      "github": "https://github.com/...",
+      "repoGit": "https://repoGit.com/...",
       "linkedin": "https://linkedin.com/in/..."
     }
   }
