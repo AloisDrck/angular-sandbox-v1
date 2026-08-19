@@ -1,0 +1,60 @@
+{
+  "projects": [
+    {
+      "id": "1",
+      "title": "API REST FastAPI",
+      "description": "API REST complète avec authentification JWT",
+      "longDescription": "Projet académique : conception et déploiement d'une API REST avec FastAPI, PostgreSQL et Docker. Implémentation d'une authentification JWT, tests d'intégration avec pytest.",
+      "techs": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "github": "https://github.com/exemple/fastapi-rest",
+      "year": 2024,
+      "type": "academic"
+    },
+    {
+      "id": "2",
+      "title": "Dashboard data pipeline",
+      "description": "Pipeline ETL et visualisation de données",
+      "longDescription": "Pipeline ETL complet : extraction depuis APIs tierces, transformation avec pandas, chargement en base, visualisation avec Streamlit.",
+      "techs": ["Python", "Pandas", "Streamlit", "SQLite"],
+      "github": "https://github.com/exemple/data-pipeline",
+      "year": 2023,
+      "type": "academic"
+    }
+  ],
+  "experiences": [
+    {
+      "id": "1",
+      "role": "Développeur Backend (stage)",
+      "company": "Entreprise Exemple",
+      "period": "2024-2024",
+      "description": "Développement de microservices Python, intégration d'APIs externes, mise en place de tests unitaires.",
+      "type": "professional"
+    },
+    {
+      "id": "2",
+      "role": "Projet intégrateur fullstack",
+      "company": "Université Exemple",
+      "period": "2023-2023",
+      "description": "Conception et développement d'une application web fullstack en équipe de 4 : backend Django, frontend React.",
+      "type": "academic"
+    }
+  ],
+  "skills": [
+    { "id": "1", "name": "Python", "category": "backend", "level": 4 },
+    { "id": "2", "name": "FastAPI", "category": "backend", "level": 3 },
+    { "id": "3", "name": "PostgreSQL", "category": "backend", "level": 3 },
+    { "id": "4", "name": "Docker", "category": "devops", "level": 2 },
+    { "id": "5", "name": "TypeScript", "category": "frontend", "level": 3 },
+    { "id": "6", "name": "Angular", "category": "frontend", "level": 2 },
+    { "id": "7", "name": "Git", "category": "devops", "level": 4 }
+  ],
+  "about": {
+    "name": "Prénom Nom",
+    "bio": "Développeur orienté backend & data, passionné par la conception de systèmes robustes et la manipulation de données. En cours de formation sur Angular pour élargir mes compétences frontend.",
+    "location": "Paris, France",
+    "links": {
+      "github": "https://github.com/exemple",
+      "linkedin": "https://linkedin.com/in/exemple"
+    }
+  }
+}
