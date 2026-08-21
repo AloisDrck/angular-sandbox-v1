@@ -1,0 +1,18 @@
+<section>
+  <h1 class="text-3xl font-bold mb-8">{{ i18n.t('skills.title') }}</h1>
+
+  <div class="space-y-8">
+    @for (category of categories(); track category) {
+      <div>
+        <h2 class="text-lg font-semibold mb-3 text-gray-700 dark:text-gray-300">
+          {{ i18n.t('skills.category.' + category) }}
+        </h2>
+        <div class="grid gap-2 sm:grid-cols-2">
+          @for (skill of groupedSkills().get(category)!; track skill.id) {
+            <app-skill-badge [skill]="skill" />
+          }
+        </div>
+      </div>
+    }
+  </div>
+</section>
