@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router'
 import { projectResolver } from './features/projects/project.resolver'
+import { canDeactivateContact } from './features/contact/can-deactivate.guard'
 
 export const routes: Routes = [
   { path: '', redirectTo: 'about', pathMatch: 'full' },
@@ -26,7 +27,8 @@ export const routes: Routes = [
   },
   {
     path: 'contact',
-    loadComponent: () => import('./features/contact/contact').then(m => m.ContactComponent)
+    loadComponent: () => import('./features/contact/contact').then(m => m.ContactComponent),
+    canDeactivate: [canDeactivateContact]
   },
   {
     path: '**',
