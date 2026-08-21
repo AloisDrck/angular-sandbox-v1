@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router'
+import { projectResolver } from './features/projects/project.resolver'
 
 export const routes: Routes = [
   { path: '', redirectTo: 'about', pathMatch: 'full' },
@@ -16,7 +17,8 @@ export const routes: Routes = [
   },
   {
     path: 'projects/:id',
-    loadComponent: () => import('./features/projects/project-detail/project-detail').then(m => m.ProjectDetailComponent)
+    loadComponent: () => import('./features/projects/project-detail/project-detail').then(m => m.ProjectDetailComponent),
+    resolve: { project: projectResolver }
   },
   {
     path: 'skills',

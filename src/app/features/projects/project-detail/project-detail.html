@@ -1,0 +1,31 @@
+@if (project(); as p) {
+  <article class="space-y-6">
+    <a routerLink="/projects" class="text-sm text-blue-600 hover:underline dark:text-blue-400">
+      ← {{ i18n.t('projects.backToList') }}
+    </a>
+
+    <div>
+      <div class="flex items-start justify-between">
+        <h1 class="text-3xl font-bold">{{ p.title }}</h1>
+        <span class="text-gray-500 text-sm">{{ p.year }}</span>
+      </div>
+    </div>
+
+    <p class="text-gray-700 dark:text-gray-300 leading-relaxed">{{ p.longDescription }}</p>
+
+    <div class="flex flex-wrap gap-2">
+      @for (tech of p.techs; track tech) {
+        <span class="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm text-gray-700 dark:text-gray-300">
+          {{ tech }}
+        </span>
+      }
+    </div>
+
+    <a [href]="p.repoGit" target="_blank" rel="noopener"
+       class="inline-block text-blue-600 hover:underline dark:text-blue-400">
+      {{ i18n.t('projects.viewGithub') }} →
+    </a>
+  </article>
+} @else {
+  <p class="text-gray-400">Chargement...</p>
+}

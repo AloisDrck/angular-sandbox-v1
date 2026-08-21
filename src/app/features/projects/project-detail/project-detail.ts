@@ -1,7 +1,19 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
+import { ActivatedRoute, RouterLink } from '@angular/router'
+import { toSignal } from '@angular/core/rxjs-interop'
+import { map } from 'rxjs'
+import { I18nService } from '../../../core/services/i18n.service'
 
 @Component({
   selector: 'app-project-detail',
-  template: '<p>Project Detail – coming soon</p>',
+  imports: [RouterLink],
+  templateUrl: './project-detail.html',
 })
-export class ProjectDetailComponent {}
+export class ProjectDetailComponent {
+  protected i18n = inject(I18nService)
+  private route = inject(ActivatedRoute)
+
+  protected project = toSignal(
+    this.route.data.pipe(map(data => data['project']))
+  )
+}
