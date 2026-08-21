@@ -24,7 +24,7 @@ describe('ProjectsComponent', () => {
     component = fixture.componentInstance
     httpMock = TestBed.inject(HttpTestingController)
     httpMock.expectOne('http://localhost:3000/projects').flush(mockProjects)
-    TestBed.flushEffects()
+    TestBed.tick()
     httpMock.expectOne('/assets/i18n/fr.json').flush({})
     fixture.detectChanges()
   })
