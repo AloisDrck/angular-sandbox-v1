@@ -6,8 +6,8 @@ import { ProjectsComponent } from './projects'
 import { Project } from '../../core/models/project.model'
 
 const mockProjects: Project[] = [
-  { id: '1', title: 'A', description: '', longDescription: '', techs: ['Python', 'FastAPI'], repoGit: '', year: 2024, type: 'academic' },
-  { id: '2', title: 'B', description: '', longDescription: '', techs: ['TypeScript'], repoGit: '', year: 2023, type: 'academic' },
+  { id: 'a-fr', slug: 'a', title: 'A', description: '', longDescription: '', techs: ['Python', 'FastAPI'], repoGit: '', year: 2024, type: 'academic' },
+  { id: 'b-fr', slug: 'b', title: 'B', description: '', longDescription: '', techs: ['TypeScript'], repoGit: '', year: 2023, type: 'academic' },
 ]
 
 describe('ProjectsComponent', () => {
@@ -23,9 +23,9 @@ describe('ProjectsComponent', () => {
     const fixture = TestBed.createComponent(ProjectsComponent)
     component = fixture.componentInstance
     httpMock = TestBed.inject(HttpTestingController)
-    httpMock.expectOne('http://localhost:3000/projects').flush(mockProjects)
     TestBed.tick()
     httpMock.expectOne('/assets/i18n/fr.json').flush({})
+    httpMock.expectOne('http://localhost:3000/projects?lang=fr').flush(mockProjects)
     fixture.detectChanges()
   })
 

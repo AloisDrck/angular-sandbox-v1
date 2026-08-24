@@ -1,7 +1,7 @@
 @if (project(); as p) {
   <article class="space-y-6">
     <a routerLink="/projects" class="text-sm text-blue-600 hover:underline dark:text-blue-400">
-      ← {{ i18n.t('projects.backToList') }}
+      {{ i18n.t('projects.backToList') }}
     </a>
 
     <div>
@@ -23,7 +23,7 @@
 
     <a [href]="p.repoGit" target="_blank" rel="noopener"
        class="inline-block text-blue-600 hover:underline dark:text-blue-400">
-      {{ i18n.t('projects.viewGithub') }} →
+      {{ i18n.t('projects.viewProject') }}
     </a>
   </article>
 } @else {

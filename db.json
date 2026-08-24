@@ -1,61 +1,156 @@
 {
-  "projects": [
+  "about": [
     {
       "id": "1",
-      "title": "API REST FastAPI",
-      "description": "API REST complète avec authentification JWT",
-      "longDescription": "Projet académique : conception et déploiement d'une API REST avec FastAPI, PostgreSQL et Docker. Implémentation d'une authentification JWT, tests d'intégration avec pytest.",
-      "techs": ["Python", "FastAPI", "PostgreSQL", "Docker"],
-      "repoGit": "https://repoGit.com/exemple/fastapi-rest",
-      "year": 2024,
-      "type": "academic"
+      "lang": "fr",
+      "name": "Aloïs Drucké",
+      "bio": "Étudiant en dernière année à l'École Polytechnique Universitaire de Montpellier, spécialisé en génie logiciel, data science et management. Actuellement consultant stagiaire au sein de CGI, en mission chez Allianz.",
+      "location": "Paris, France",
+      "links": {
+        "repoGit": "https://github.com/AloisDrck",
+        "gitlab": "https://gitlab.com/lolo.nezo",
+        "linkedin": "https://linkedin.com/in/aloisdrucke"
+      }
     },
     {
       "id": "2",
-      "title": "Dashboard data pipeline",
-      "description": "Pipeline ETL et visualisation de données",
-      "longDescription": "Pipeline ETL complet : extraction depuis APIs tierces, transformation avec pandas, chargement en base, visualisation avec Streamlit.",
-      "techs": ["Python", "Pandas", "Streamlit", "SQLite"],
-      "repoGit": "https://repoGit.com/exemple/data-pipeline",
-      "year": 2023,
-      "type": "academic"
+      "lang": "en",
+      "name": "Aloïs Drucké",
+      "bio": "5th year engineering student in Software Architecture, Data Science and Management. Currently a trainee consultant at CGI, on assignment at Allianz Trade in Paris.",
+      "location": "Paris, France",
+      "links": {
+        "repoGit": "https://github.com/AloisDrck",
+        "gitlab": "https://gitlab.com/lolo.nezo",
+        "linkedin": "https://linkedin.com/in/aloisdrucke"
+      }
     }
   ],
   "experiences": [
     {
       "id": "1",
+      "lang": "fr",
       "role": "Développeur Backend (stage)",
-      "company": "Entreprise Exemple",
-      "period": "2024-2024",
-      "description": "Développement de microservices Python, intégration d'APIs externes, mise en place de tests unitaires.",
+      "company": "CGI – Allianz Trade",
+      "period": "Avril 2026 – Présent",
+      "description": "• En mission dans l'équipe Innovation d'Allianz Trade.\n• Développement d'endpoints REST sur des APIs façade Node.js en TypeScript.\n• Conception et réalisation de missions transverses afin d'améliorer l'environnement de travail de l'équipe.\n• Méthodes de travail Agile : daily, weekly avec les PO.",
       "type": "professional"
     },
     {
       "id": "2",
-      "role": "Projet intégrateur fullstack",
-      "company": "Université Exemple",
-      "period": "2023-2023",
-      "description": "Conception et développement d'une application web fullstack en équipe de 4 : backend Django, frontend React.",
+      "lang": "en",
+      "role": "Backend Developer (internship)",
+      "company": "CGI – Allianz Trade",
+      "period": "April 2026 – Present",
+      "description": "• On assignment within Allianz Trade's Innovation team.\n• Developed REST endpoints on Node.js/TypeScript facade APIs.\n• Designed and delivered cross-functional tasks to improve the team's work environment.\n• Agile workflow: daily stand-ups, weeklies with POs.",
+      "type": "professional"
+    },
+    {
+      "id": "3",
+      "lang": "fr",
+      "role": "Chercheur AI – Deep Learning (stage)",
+      "company": "Monash University Malaysia",
+      "period": "Avril 2025 – Août 2025",
+      "description": "• 4 mois de stage sous la supervision d'un responsable de laboratoire au sein de l'université Monash à Kuala Lumpur (Malaisie).\n• Découverte du monde de la recherche tout en approfondissant mes connaissances en Deep Learning.",
+      "type": "professional"
+    },
+    {
+      "id": "4",
+      "lang": "en",
+      "role": "AI Research Intern – Deep Learning",
+      "company": "Monash University Malaysia",
+      "period": "April 2025 – August 2025",
+      "description": "• 4-month research internship under the supervision of a lab manager at Monash University in Kuala Lumpur, Malaysia.\n• Gained hands-on experience in academic research while deepening knowledge in Deep Learning.",
+      "type": "professional"
+    }
+  ],
+  "projects": [
+    {
+      "id": "treko-fr",
+      "slug": "treko",
+      "lang": "fr",
+      "title": "Projet de Fin d'Etudes",
+      "description": "Module de tracking sportif",
+      "longDescription": "Développement d'un module de tracker sportif basé sur le GPS et les capteurs mobiles, intégrable dans une application existante.\n• Conception d'une architecture modulaire cross-platform.\n• Gestion du tracking continu (foreground/background), optimisation batterie, fiabilisation des données.\n• Comparaison des performances avec des solutions du marché.",
+      "techs": ["React Native", "Node.js", "Express", "PostgreSQL", "Docker"],
+      "repoGit": "https://gitlab.com/lewis.bonnetete/tracker-treko-x-zolois",
+      "year": 2025,
+      "type": "academic"
+    },
+    {
+      "id": "treko-en",
+      "slug": "treko",
+      "lang": "en",
+      "title": "End-of-Studies Project",
+      "description": "Sports tracking module",
+      "longDescription": "Developed a sports tracking module based on GPS and mobile sensors, designed to be embedded into an existing application.\n• Designed a modular cross-platform architecture.\n• Managed continuous tracking (foreground/background), battery optimisation and data reliability.\n• Benchmarked performance against existing market solutions.",
+      "techs": ["React Native", "Node.js", "Express", "PostgreSQL", "Docker"],
+      "repoGit": "https://gitlab.com/lewis.bonnetete/tracker-treko-x-zolois",
+      "year": 2025,
+      "type": "academic"
+    },
+    {
+      "id": "ecommerce-fr",
+      "slug": "ecommerce-ia",
+      "lang": "fr",
+      "title": "Plateforme e-commerce avec IA",
+      "description": "Application web de génération de sites e-commerce avec IA intégrée",
+      "longDescription": "Développement d'une application web de génération de sites e-commerce avec Dashboard de gestion.\n• Intégration d'un système de recommandation et d'un chatbot basés sur un LLM via LangChain.\n• Architecture full-stack avec gestion des produits, commandes et personnalisation via IA.",
+      "techs": ["Python", "LangChain", "React", "Node.js", "PostgreSQL", "Docker", "Kubernetes"],
+      "repoGit": "",
+      "year": 2025,
+      "type": "academic"
+    },
+    {
+      "id": "ecommerce-en",
+      "slug": "ecommerce-ia",
+      "lang": "en",
+      "title": "E-commerce Platform with AI",
+      "description": "Web app for AI-powered e-commerce site generation",
+      "longDescription": "Built a web application for generating e-commerce sites with a management dashboard.\n• Integrated a recommendation system and chatbot powered by an LLM via LangChain.\n• Full-stack architecture with product, order and AI-driven personalisation management.",
+      "techs": ["Python", "LangChain", "React", "Node.js", "PostgreSQL", "Docker", "Kubernetes"],
+      "repoGit": "",
+      "year": 2025,
+      "type": "academic"
+    },
+    {
+      "id": "plantsit-fr",
+      "slug": "plantsit",
+      "lang": "fr",
+      "title": "PlantSit",
+      "description": "Application mobile mettant en relation des utilisateurs pour la garde de plantes",
+      "longDescription": "Développement d'une application mobile mettant en relation des utilisateurs pour la garde de plantes.\n• Conception d'une architecture micro-services.\n• Déploiement sur Kubernetes et mise en place d'une pipeline CI/CD pour l'automatisation des builds et des déploiements.",
+      "techs": ["Java", "Springboot", "React Native", "Expo", "Kubernetes", "Docker"],
+      "repoGit": "https://repoGit.com/exemple/data-pipeline",
+      "year": 2025,
+      "type": "academic"
+    },
+    {
+      "id": "plantsit-en",
+      "slug": "plantsit",
+      "lang": "en",
+      "title": "PlantSit",
+      "description": "Mobile app connecting users for plant sitting",
+      "longDescription": "Built a mobile app connecting users for plant sitting.\n• Designed a micro-services architecture.\n• Deployed on Kubernetes and set up a CI/CD pipeline to automate builds and deployments.",
+      "techs": ["Java", "Springboot", "React Native", "Expo", "Kubernetes", "Docker"],
+      "repoGit": "https://repoGit.com/exemple/data-pipeline",
+      "year": 2025,
       "type": "academic"
     }
   ],
   "skills": [
-    { "id": "1", "name": "Python", "category": "backend", "level": 4 },
-    { "id": "2", "name": "FastAPI", "category": "backend", "level": 3 },
-    { "id": "3", "name": "PostgreSQL", "category": "backend", "level": 3 },
-    { "id": "4", "name": "Docker", "category": "devops", "level": 2 },
-    { "id": "5", "name": "TypeScript", "category": "frontend", "level": 3 },
-    { "id": "6", "name": "Angular", "category": "frontend", "level": 2 },
-    { "id": "7", "name": "Git", "category": "devops", "level": 4 }
-  ],
-  "about": {
-    "name": "Prénom Nom",
-    "bio": "Développeur orienté backend & data, passionné par la conception de systèmes robustes et la manipulation de données. En cours de formation sur Angular pour élargir mes compétences frontend.",
-    "location": "Paris, France",
-    "links": {
-      "repoGit": "https://repoGit.com/exemple",
-      "gitlab": "https://gitlab.com/exemple",
-      "linkedin": "https://linkedin.com/in/exemple"
-    }
-  }
+    { "id": "1",  "name": "Python",      "category": "backend",  "level": 4 },
+    { "id": "2",  "name": "Node.js",     "category": "backend",  "level": 4 },
+    { "id": "3",  "name": "Java",        "category": "backend",  "level": 4 },
+    { "id": "4",  "name": "Spring",      "category": "backend",  "level": 3 },
+    { "id": "5",  "name": "TypeScript",  "category": "frontend", "level": 4 },
+    { "id": "6",  "name": "Angular",     "category": "frontend", "level": 3 },
+    { "id": "7",  "name": "React",       "category": "frontend", "level": 3 },
+    { "id": "8",  "name": "Swift",       "category": "frontend", "level": 2 },
+    { "id": "9",  "name": "Docker",      "category": "devops",   "level": 3 },
+    { "id": "10", "name": "Kubernetes",  "category": "devops",   "level": 2 },
+    { "id": "11", "name": "Git",         "category": "devops",   "level": 4 },
+    { "id": "12", "name": "CI/CD",       "category": "devops",   "level": 3 },
+    { "id": "13", "name": "PostgreSQL",  "category": "data",     "level": 3 },
+    { "id": "14", "name": "DynamoDB",    "category": "data",     "level": 2 }
+  ]
 }

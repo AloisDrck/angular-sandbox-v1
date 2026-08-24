@@ -2,7 +2,7 @@ import { inject, Injectable, PLATFORM_ID, signal } from '@angular/core'
 import { isPlatformBrowser } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { toObservable, toSignal } from '@angular/core/rxjs-interop'
-import { of, switchMap } from 'rxjs'
+import { of, switchMap, catchError } from 'rxjs'
 
 @Injectable({ providedIn: 'root' })
 export class I18nService {
@@ -15,7 +15,9 @@ export class I18nService {
     toObservable(this.lang).pipe(
       switchMap(lang => {
         if (!isPlatformBrowser(this.platformId)) return of({} as Record<string, string>)
-        return this.http.get<Record<string, string>>(`/assets/i18n/${lang}.json`)
+        return this.http.get<Record<string, string>>(`/assets/i18n/${lang}.json`).pipe(
+          catchError(() => of({} as Record<string, string>))
+        )
       })
     ),
     { initialValue: {} as Record<string, string> }

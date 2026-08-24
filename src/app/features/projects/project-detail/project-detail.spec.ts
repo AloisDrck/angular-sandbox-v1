@@ -8,7 +8,8 @@ import { I18nService } from '../../../core/services/i18n.service'
 import { Project } from '../../../core/models/project.model'
 
 const mockProject: Project = {
-  id: '1',
+  id: 'portfolio-fr',
+  slug: 'portfolio',
   title: 'Mon Projet',
   description: 'desc',
   longDescription: 'Une description longue',
@@ -22,7 +23,7 @@ class MockI18nService {
   t(key: string): string {
     const map: Record<string, string> = {
       'projects.backToList': 'Retour à la liste',
-      'projects.viewGithub': 'Voir sur GitHub',
+      'projects.viewProject': 'Voir le projet',
     }
     return map[key] ?? key
   }
