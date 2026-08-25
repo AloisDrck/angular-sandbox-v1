@@ -1,59 +1,53 @@
-# AngularSandboxV1
+# Portfolio Angular
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.4.
+Application portfolio développée avec Angular 22 dans un objectif formatif — explorer les concepts fondamentaux du framework tout en construisant un projet concret.
 
-## Development server
+## Sections
 
-To start a local development server, run:
+| Route | Description |
+|---|---|
+| `/about` | Présentation personnelle |
+| `/experience` | Timeline des expériences académiques et professionnelles |
+| `/projects` | Liste des projets avec filtre par technologie, détail par projet |
+| `/skills` | Visualisation des compétences par catégorie |
+| `/contact` | Formulaire de contact |
 
-```bash
-ng serve
-```
+## Concepts Angular explorés
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- **Routing** — lazy loading, route params, resolvers, guards (`CanDeactivate`)
+- **State management** — Signals (`signal`, `computed`, `effect`), RxJS (`Observable`, `switchMap`), pont `toSignal` / `toObservable`
+- **SSR & Hydration** — `@angular/ssr`, `isPlatformBrowser`, `TransferState`
+- **Internationalisation** — FR/EN via fichiers JSON + service custom
+- **Dark/Light theme** — Tailwind v4 + `effect()` + `localStorage`
+- **Tests** — Vitest, `TestBed`, `HttpTestingController`
 
-## Code scaffolding
+## Stack
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Angular 22 (standalone components)
+- Tailwind CSS v4
+- json-server (faux backend REST)
+- Vitest
+- SSR via `@angular/ssr` + Express
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Démarrage
 
 ```bash
-ng test
+# Installer les dépendances
+npm install
+
+# Lancer Angular + json-server en parallèle
+npm run dev
 ```
 
-## Running end-to-end tests
+## Spécifications
 
-For end-to-end (e2e) testing, run:
+Le document de design complet est disponible dans [`docs/superpowers/specs/2026-08-19-portfolio-angular-design.md`](docs/superpowers/specs/2026-08-19-portfolio-angular-design.md).
+
+## Commandes utiles
 
 ```bash
-ng e2e
+ng serve          # Serveur de développement (http://localhost:4200)
+ng build          # Build de production
+ng test           # Tests unitaires
+ng generate component <nom>   # Générer un composant
 ```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

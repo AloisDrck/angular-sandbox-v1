@@ -1,0 +1,7 @@
+<button (click)="themeService.toggle()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" [attr.aria-label]="themeService.theme() === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'">
+  @if (themeService.theme() === 'dark') {
+    ☀️
+  } @else {
+    🌙
+  }
+</button>
