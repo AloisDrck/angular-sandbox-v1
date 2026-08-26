@@ -2,15 +2,27 @@
   <h1 class="text-3xl font-bold mb-6">{{ i18n.t('projects.title') }}</h1>
 
   <div class="flex flex-wrap gap-2 mb-8">
-    <button (click)="selectTech(null)"
-            [class]="!selectedTech() ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
-            class="px-3 py-1 rounded-full text-sm transition-colors">
+    <button
+      (click)="selectTech(null)"
+      [class]="
+        !selectedTech()
+          ? 'bg-blue-600 text-white'
+          : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+      "
+      class="px-3 py-1 rounded-full text-sm transition-colors"
+    >
       {{ i18n.t('projects.filter.all') }}
     </button>
     @for (tech of availableTechs(); track tech) {
-      <button (click)="selectTech(tech)"
-              [class]="selectedTech() === tech ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
-              class="px-3 py-1 rounded-full text-sm transition-colors">
+      <button
+        (click)="selectTech(tech)"
+        [class]="
+          selectedTech() === tech
+            ? 'bg-blue-600 text-white'
+            : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+        "
+        class="px-3 py-1 rounded-full text-sm transition-colors"
+      >
         {{ tech }}
       </button>
     }

@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core'
-import { RouterLink } from '@angular/router'
-import { I18nService } from '../../core/services/i18n.service'
+import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { I18nService } from '../../core/services/i18n.service';
 
 @Component({
   selector: 'app-not-found',
@@ -8,5 +8,5 @@ import { I18nService } from '../../core/services/i18n.service'
   templateUrl: './not-found.html',
 })
 export class NotFoundComponent {
-  protected i18n = inject(I18nService)
+  protected i18n = inject(I18nService);
 }

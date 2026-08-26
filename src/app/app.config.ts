@@ -1,9 +1,9 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core'
-import { provideRouter, withComponentInputBinding } from '@angular/router'
-import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http'
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser'
-import { routes } from './app.routes'
-import { loadingInterceptor } from './core/interceptors/loading.interceptor'
+import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
+import { routes } from './app.routes';
+import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -11,5 +11,5 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(withFetch(), withInterceptors([loadingInterceptor])),
     provideClientHydration(withEventReplay()),
-  ]
-}
+  ],
+};

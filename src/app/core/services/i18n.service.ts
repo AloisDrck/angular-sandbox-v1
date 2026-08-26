@@ -1,28 +1,33 @@
-import { inject, Injectable, signal } from '@angular/core'
-import { HttpClient } from '@angular/common/http'
-import { toObservable, toSignal } from '@angular/core/rxjs-interop'
-import { switchMap } from 'rxjs'
+import { inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { of, switchMap, catchError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class I18nService {
-  private http = inject(HttpClient)
+  private http = inject(HttpClient);
+  private platformId = inject(PLATFORM_ID);
 
-  lang = signal<'fr' | 'en'>('fr')
+  lang = signal<'fr' | 'en'>('fr');
 
   private translations = toSignal(
     toObservable(this.lang).pipe(
-      switchMap(lang =>
-        this.http.get<Record<string, string>>(`/assets/i18n/${lang}.json`)
-      )
+      switchMap((lang) => {
+        if (!isPlatformBrowser(this.platformId)) return of({} as Record<string, string>);
+        return this.http
+          .get<Record<string, string>>(`/assets/i18n/${lang}.json`)
+          .pipe(catchError(() => of({} as Record<string, string>)));
+      }),
     ),
-    { initialValue: {} as Record<string, string> }
-  )
+    { initialValue: {} as Record<string, string> },
+  );
 
   t(key: string): string {
-    return this.translations()[key] ?? key
+    return this.translations()[key] ?? key;
   }
 
   setLang(lang: 'fr' | 'en'): void {
-    this.lang.set(lang)
+    this.lang.set(lang);
   }
 }

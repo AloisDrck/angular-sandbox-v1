@@ -1,11 +1,48 @@
-<header class="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+<header
+  class="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+>
   <nav class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
     <ul class="flex gap-2">
-      <li><a routerLink="/about" routerLinkActive="font-semibold text-blue-600 dark:text-blue-400" class="px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-sm">{{ i18n.t('nav.about') }}</a></li>
-      <li><a routerLink="/experience" routerLinkActive="font-semibold text-blue-600 dark:text-blue-400" class="px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-sm">{{ i18n.t('nav.experience') }}</a></li>
-      <li><a routerLink="/projects" routerLinkActive="font-semibold text-blue-600 dark:text-blue-400" class="px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-sm">{{ i18n.t('nav.projects') }}</a></li>
-      <li><a routerLink="/skills" routerLinkActive="font-semibold text-blue-600 dark:text-blue-400" class="px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-sm">{{ i18n.t('nav.skills') }}</a></li>
-      <li><a routerLink="/contact" routerLinkActive="font-semibold text-blue-600 dark:text-blue-400" class="px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-sm">{{ i18n.t('nav.contact') }}</a></li>
+      <li>
+        <a
+          routerLink="/about"
+          routerLinkActive="font-semibold text-blue-600 dark:text-sky-400"
+          class="px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-sm dark:text-gray-200"
+          >{{ i18n.t('nav.about') }}</a
+        >
+      </li>
+      <li>
+        <a
+          routerLink="/experience"
+          routerLinkActive="font-semibold text-blue-600 dark:text-sky-400"
+          class="px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-sm dark:text-gray-200"
+          >{{ i18n.t('nav.experience') }}</a
+        >
+      </li>
+      <li>
+        <a
+          routerLink="/projects"
+          routerLinkActive="font-semibold text-blue-600 dark:text-sky-400"
+          class="px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-sm dark:text-gray-200"
+          >{{ i18n.t('nav.projects') }}</a
+        >
+      </li>
+      <li>
+        <a
+          routerLink="/skills"
+          routerLinkActive="font-semibold text-blue-600 dark:text-sky-400"
+          class="px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-sm dark:text-gray-200"
+          >{{ i18n.t('nav.skills') }}</a
+        >
+      </li>
+      <li>
+        <a
+          routerLink="/contact"
+          routerLinkActive="font-semibold text-blue-600 dark:text-sky-400"
+          class="px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-sm dark:text-gray-200"
+          >{{ i18n.t('nav.contact') }}</a
+        >
+      </li>
     </ul>
     <div class="flex items-center gap-1">
       <app-lang-toggle />
