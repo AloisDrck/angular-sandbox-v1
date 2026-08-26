@@ -138,19 +138,19 @@
     }
   ],
   "skills": [
-    { "id": "1",  "name": "Python",      "category": "backend",  "level": 4 },
-    { "id": "2",  "name": "Node.js",     "category": "backend",  "level": 4 },
-    { "id": "3",  "name": "Java",        "category": "backend",  "level": 4 },
-    { "id": "4",  "name": "Spring",      "category": "backend",  "level": 3 },
-    { "id": "5",  "name": "TypeScript",  "category": "frontend", "level": 4 },
-    { "id": "6",  "name": "Angular",     "category": "frontend", "level": 3 },
-    { "id": "7",  "name": "React",       "category": "frontend", "level": 3 },
-    { "id": "8",  "name": "Swift",       "category": "frontend", "level": 2 },
-    { "id": "9",  "name": "Docker",      "category": "devops",   "level": 3 },
-    { "id": "10", "name": "Kubernetes",  "category": "devops",   "level": 2 },
-    { "id": "11", "name": "Git",         "category": "devops",   "level": 4 },
-    { "id": "12", "name": "CI/CD",       "category": "devops",   "level": 3 },
-    { "id": "13", "name": "PostgreSQL",  "category": "data",     "level": 3 },
-    { "id": "14", "name": "DynamoDB",    "category": "data",     "level": 2 }
+    { "id": "1", "name": "Python", "category": "backend", "level": 4 },
+    { "id": "2", "name": "Node.js", "category": "backend", "level": 4 },
+    { "id": "3", "name": "Java", "category": "backend", "level": 4 },
+    { "id": "4", "name": "Spring", "category": "backend", "level": 3 },
+    { "id": "5", "name": "TypeScript", "category": "frontend", "level": 4 },
+    { "id": "6", "name": "Angular", "category": "frontend", "level": 3 },
+    { "id": "7", "name": "React", "category": "frontend", "level": 3 },
+    { "id": "8", "name": "Swift", "category": "frontend", "level": 2 },
+    { "id": "9", "name": "Docker", "category": "devops", "level": 3 },
+    { "id": "10", "name": "Kubernetes", "category": "devops", "level": 2 },
+    { "id": "11", "name": "Git", "category": "devops", "level": 4 },
+    { "id": "12", "name": "CI/CD", "category": "devops", "level": 3 },
+    { "id": "13", "name": "PostgreSQL", "category": "data", "level": 3 },
+    { "id": "14", "name": "DynamoDB", "category": "data", "level": 2 }
   ]
 }

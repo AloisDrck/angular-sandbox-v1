@@ -4,13 +4,13 @@ Application portfolio développée avec Angular 22 dans un objectif formatif —
 
 ## Sections
 
-| Route | Description |
-|---|---|
-| `/about` | Présentation personnelle |
-| `/experience` | Timeline des expériences académiques et professionnelles |
-| `/projects` | Liste des projets avec filtre par technologie, détail par projet |
-| `/skills` | Visualisation des compétences par catégorie |
-| `/contact` | Formulaire de contact |
+| Route         | Description                                                      |
+| ------------- | ---------------------------------------------------------------- |
+| `/about`      | Présentation personnelle                                         |
+| `/experience` | Timeline des expériences académiques et professionnelles         |
+| `/projects`   | Liste des projets avec filtre par technologie, détail par projet |
+| `/skills`     | Visualisation des compétences par catégorie                      |
+| `/contact`    | Formulaire de contact                                            |
 
 ## Concepts Angular explorés
 

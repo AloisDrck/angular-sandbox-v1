@@ -1,7 +1,7 @@
-import { Component, inject, input } from '@angular/core'
-import { RouterLink } from '@angular/router'
-import { Project } from '../../../core/models/project.model'
-import { I18nService } from '../../../core/services/i18n.service'
+import { Component, inject, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { Project } from '../../../core/models/project.model';
+import { I18nService } from '../../../core/services/i18n.service';
 
 @Component({
   selector: 'app-project-card',
@@ -9,6 +9,6 @@ import { I18nService } from '../../../core/services/i18n.service'
   templateUrl: './project-card.html',
 })
 export class ProjectCardComponent {
-  project = input.required<Project>()
-  protected i18n = inject(I18nService)
+  project = input.required<Project>();
+  protected i18n = inject(I18nService);
 }
