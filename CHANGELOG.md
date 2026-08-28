@@ -8,6 +8,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- 3D card flip on `ProjectCard`: hover reveals back face with full tech stack and CTA link (CSS `perspective` / `rotateY` / `backface-visibility`)
+- Floating ambient animation on About card and each Experience timeline item (CSS `@keyframes micro-float` with staggered durations and delays)
+- `src/animations.css`: dedicated stylesheet for flip and float utilities, registered in `angular.json`
+- `projects.type` i18n keys (academic / professional / personal) in FR and EN translation files
+- `ProjectCard` back face: stats block (year, type), full tech stack pills and "View project" CTA
+- `prefers-reduced-motion: reduce` media query disabling all transitions and animations
+- `TimelineItem` card layout: rounded card with border and shadow replacing plain div; fixed vertical timeline line anchored to the container
+
+### Changed
+
+- Experience timeline: `border-l-2` line moved to the container so it stays fixed while cards float independently
+- `ProjectCard` host now uses `display: block` via `host: { class: 'block' }` to enable CSS transforms
+- `TimelineItem` host now uses `display: block` via `host: { class: 'block' }` to enable CSS transforms
+- Animation CSS extracted from `styles.css` into `src/animations.css` to avoid Tailwind PostCSS dev-server stripping
+
+---
+
+### Added (previous)
+
 - Dark mode with global CSS palette (body `gray-950`, navbar `gray-900`, cards `gray-900`) and ThemeToggle
 - Multilingual content (FR/EN) via reactive `PortfolioService` with `?lang=` filtering on json-server
 - `I18nService` with `toSignal`/`toObservable` and FR/EN JSON translation files
