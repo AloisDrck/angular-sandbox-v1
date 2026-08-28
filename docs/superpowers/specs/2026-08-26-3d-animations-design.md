@@ -22,25 +22,30 @@ All animations are implemented in pure CSS (Tailwind v4 `@keyframes` + utilities
 Mouse hover on `<app-project-card>`.
 
 ### Front face (Option B)
-| Element | Style |
-|---|---|
-| Background | `linear-gradient(135deg, #1e1b4b → #0f172a)` |
-| Border | `1px solid #4338ca` |
-| Type badge | Small pill top-left — `bg-indigo-900 text-indigo-300` uppercase |
-| Title | Large (`text-xl font-extrabold text-indigo-100`) |
-| Year | `text-indigo-500 font-semibold text-sm` |
-| Description | `text-sm text-slate-400` |
-| Tech pills | `bg-indigo-950 border border-indigo-700 text-indigo-300 rounded-full` |
-| Hover hint | Tiny muted text `← survolez →` |
+
+| Element | Dark mode | Light mode |
+|---|---|---|
+| Background | `linear-gradient(135deg, #1e1b4b, #0f172a)` | `linear-gradient(135deg, #eef2ff, #f8fafc)` |
+| Border | `1px solid #4338ca` | `1px solid #c7d2fe` |
+| Type badge | `bg-indigo-900 text-indigo-300` | `bg-indigo-100 text-indigo-700` |
+| Title | `text-indigo-100 font-extrabold` | `text-indigo-950 font-extrabold` |
+| Year | `text-indigo-500 font-semibold` | `text-indigo-600 font-semibold` |
+| Description | `text-slate-400` | `text-slate-500` |
+| Tech pills | `bg-indigo-950 border-indigo-700 text-indigo-300` | `bg-indigo-100 border-indigo-200 text-indigo-700` |
+| Hover hint | `text-indigo-900` (barely visible) | `text-indigo-200` (barely visible) |
 
 ### Back face (Mix B + C)
-| Element | Style |
-|---|---|
-| Background | `linear-gradient(145deg, #1a2a4a → #1e293b)` |
-| Border | `1px solid #3b82f6` |
-| Stats row | Two blocks side-by-side: **Année** + **Type** (`bg-slate-900`, value `text-blue-400 font-bold`) |
-| Tech section | Label "STACK TECHNIQUE" + all techs as `bg-blue-900/50 text-blue-300 border border-blue-700` pills |
-| CTA button | `bg-blue-600 text-white font-semibold rounded-lg` → `[routerLink]` to project detail page |
+
+| Element | Dark mode | Light mode |
+|---|---|---|
+| Background | `linear-gradient(145deg, #1a2a4a, #1e293b)` | `linear-gradient(145deg, #eff6ff, #f8fafc)` |
+| Border | `1px solid #3b82f6` | `1px solid #93c5fd` |
+| Stats block bg | `bg-slate-950 border-slate-800` | `bg-white border-blue-100` |
+| Stats value | `text-blue-400 font-bold` | `text-blue-600 font-bold` |
+| Stats label | `text-slate-500` | `text-slate-400` |
+| Tech label | `text-blue-500` uppercase | `text-blue-600` uppercase |
+| Tech pills | `bg-blue-900/50 border-blue-700 text-blue-300` | `bg-blue-50 border-blue-200 text-blue-700` |
+| CTA button | `bg-blue-600 text-white` | `bg-blue-600 text-white` (identique) |
 
 ### CSS mechanics
 ```css
@@ -77,18 +82,30 @@ The existing `[routerLink]` on the title moves to the CTA button on the back fac
 | Animation name | `micro-float` |
 
 ### Keyframe (shared, defined once in `styles.css`)
+
+The keyframe is mode-agnostic (transform only). The `box-shadow` tint differs per mode and is applied via the `.float-*` classes:
+
 ```css
 @keyframes micro-float {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-    box-shadow: 0 1px 6px rgba(99, 102, 241, 0.08);
-  }
-  50% {
-    transform: translateY(-2px) rotate(0.3deg);
-    box-shadow: 0 5px 14px rgba(99, 102, 241, 0.20);
-  }
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%       { transform: translateY(-2px) rotate(0.3deg); }
+}
+
+/* Dark mode shadow (default) */
+[class*='float-'] {
+  box-shadow: 0 1px 6px rgba(99, 102, 241, 0.08);
+}
+[class*='float-']:is(.dark *) {
+  /* already correct — indigo tint visible on dark bg */
+}
+
+/* Light mode shadow — slightly lighter */
+:where(:not(.dark)) [class*='float-'] {
+  box-shadow: 0 1px 6px rgba(99, 102, 241, 0.06);
 }
 ```
+
+> In practice, since the shadow is very subtle, a single shared value of `rgba(99, 102, 241, 0.08)` is acceptable for both modes. The Tailwind `@variant dark` convention in the project handles the override if needed.
 
 ### About card
 Applied once with a fixed cycle:
