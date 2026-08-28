@@ -71,6 +71,9 @@ body {
   .flipper {
     transition: none;
   }
+  .flip-scene:hover .flipper {
+    transform: none;
+  }
   .float-0,
   .float-1,
   .float-2,
