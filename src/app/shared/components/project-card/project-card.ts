@@ -7,6 +7,7 @@ import { I18nService } from '../../../core/services/i18n.service';
   selector: 'app-project-card',
   imports: [RouterLink],
   templateUrl: './project-card.html',
+  host: { class: 'block' },
 })
 export class ProjectCardComponent {
   project = input.required<Project>();
