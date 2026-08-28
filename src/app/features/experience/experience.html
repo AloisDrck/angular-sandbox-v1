@@ -2,8 +2,8 @@
   <h1 class="text-3xl font-bold mb-8">{{ i18n.t('experience.title') }}</h1>
 
   <div class="mt-6">
-    @for (exp of experiences(); track exp.id) {
-      <app-timeline-item [experience]="exp" />
+    @for (exp of experiences(); track exp.id; let i = $index) {
+      <app-timeline-item [experience]="exp" [class]="'float-' + (i % 4)" />
     } @empty {
       <p class="text-gray-400">Chargement...</p>
     }
