@@ -12,21 +12,22 @@
 
 ## File Map
 
-| File | Action | Responsibility |
-|---|---|---|
-| `src/styles.css` | Modify | Flip utilities + float keyframes + a11y |
-| `src/app/shared/components/project-card/project-card.html` | Modify | Flip scene structure + light/dark styles |
-| `src/app/shared/components/project-card/project-card.spec.ts` | Create | Verify flip DOM structure + CTA link |
-| `public/assets/i18n/fr.json` | Modify | Add `projects.type.*` translation keys |
-| `public/assets/i18n/en.json` | Modify | Add `projects.type.*` translation keys |
-| `src/app/features/about/about.html` | Modify | Add card wrapper + `float-0` class |
-| `src/app/features/experience/experience.html` | Modify | Add `$index` + `float-{i%4}` class binding |
+| File                                                          | Action | Responsibility                             |
+| ------------------------------------------------------------- | ------ | ------------------------------------------ |
+| `src/styles.css`                                              | Modify | Flip utilities + float keyframes + a11y    |
+| `src/app/shared/components/project-card/project-card.html`    | Modify | Flip scene structure + light/dark styles   |
+| `src/app/shared/components/project-card/project-card.spec.ts` | Create | Verify flip DOM structure + CTA link       |
+| `public/assets/i18n/fr.json`                                  | Modify | Add `projects.type.*` translation keys     |
+| `public/assets/i18n/en.json`                                  | Modify | Add `projects.type.*` translation keys     |
+| `src/app/features/about/about.html`                           | Modify | Add card wrapper + `float-0` class         |
+| `src/app/features/experience/experience.html`                 | Modify | Add `$index` + `float-{i%4}` class binding |
 
 ---
 
 ## Task 1: CSS foundations
 
 **Files:**
+
 - Modify: `src/styles.css`
 
 - [ ] **Step 1 — Append flip utilities and float keyframes to `src/styles.css`**
@@ -138,6 +139,7 @@ git commit -m "feat: add flip-scene and micro-float CSS utilities"
 The front face of the flipped card shows the project type as a translated badge. The existing keys `experience.type.*` belong to the Experience section; projects need their own keys.
 
 **Files:**
+
 - Modify: `public/assets/i18n/fr.json`
 - Modify: `public/assets/i18n/en.json`
 
@@ -181,6 +183,7 @@ git commit -m "feat: add projects.type i18n keys for card flip badge"
 ## Task 3: ProjectCard flip template
 
 **Files:**
+
 - Modify: `src/app/shared/components/project-card/project-card.html`
 - Create: `src/app/shared/components/project-card/project-card.spec.ts`
 
@@ -189,13 +192,13 @@ git commit -m "feat: add projects.type i18n keys for card flip badge"
 Create `src/app/shared/components/project-card/project-card.spec.ts`:
 
 ```typescript
-import { TestBed } from '@angular/core/testing'
-import { ComponentFixture } from '@angular/core/testing'
-import { provideRouter } from '@angular/router'
-import { signal } from '@angular/core'
-import { ProjectCardComponent } from './project-card'
-import { I18nService } from '../../../core/services/i18n.service'
-import { Project } from '../../../core/models/project.model'
+import { TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { signal } from '@angular/core';
+import { ProjectCardComponent } from './project-card';
+import { I18nService } from '../../../core/services/i18n.service';
+import { Project } from '../../../core/models/project.model';
 
 const mockProject: Project = {
   id: 'treko-fr',
@@ -207,7 +210,7 @@ const mockProject: Project = {
   repoGit: 'https://gitlab.com/test',
   year: 2025,
   type: 'academic',
-}
+};
 
 const mockI18n = {
   lang: signal<'fr' | 'en'>('fr'),
@@ -215,58 +218,55 @@ const mockI18n = {
     const map: Record<string, string> = {
       'projects.viewProject': 'Voir le projet',
       'projects.type.academic': 'Académique',
-    }
-    return map[key] ?? key
+    };
+    return map[key] ?? key;
   },
-}
+};
 
 describe('ProjectCardComponent', () => {
-  let fixture: ComponentFixture<ProjectCardComponent>
+  let fixture: ComponentFixture<ProjectCardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ProjectCardComponent],
-      providers: [
-        provideRouter([]),
-        { provide: I18nService, useValue: mockI18n },
-      ],
-    }).compileComponents()
+      providers: [provideRouter([]), { provide: I18nService, useValue: mockI18n }],
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(ProjectCardComponent)
-    fixture.componentRef.setInput('project', mockProject)
-    TestBed.tick()
-    fixture.detectChanges()
-  })
+    fixture = TestBed.createComponent(ProjectCardComponent);
+    fixture.componentRef.setInput('project', mockProject);
+    TestBed.tick();
+    fixture.detectChanges();
+  });
 
   it('affiche le titre du projet sur la face avant', () => {
-    const front = fixture.nativeElement.querySelector('.face.front')
-    expect(front?.textContent).toContain('Projet Treko')
-  })
+    const front = fixture.nativeElement.querySelector('.face.front');
+    expect(front?.textContent).toContain('Projet Treko');
+  });
 
   it('affiche le badge de type traduit sur la face avant', () => {
-    const front = fixture.nativeElement.querySelector('.face.front')
-    expect(front?.textContent).toContain('Académique')
-  })
+    const front = fixture.nativeElement.querySelector('.face.front');
+    expect(front?.textContent).toContain('Académique');
+  });
 
   it('affiche toutes les techs sur la face arrière', () => {
-    const back = fixture.nativeElement.querySelector('.face.back')
-    expect(back?.textContent).toContain('React Native')
-    expect(back?.textContent).toContain('Node.js')
-  })
+    const back = fixture.nativeElement.querySelector('.face.back');
+    expect(back?.textContent).toContain('React Native');
+    expect(back?.textContent).toContain('Node.js');
+  });
 
   it('le bouton CTA de la face arrière pointe vers le bon slug', () => {
-    const cta: HTMLAnchorElement = fixture.nativeElement.querySelector('.face.back a[href]')
-    expect(cta?.getAttribute('href')).toContain('treko')
-  })
+    const cta: HTMLAnchorElement = fixture.nativeElement.querySelector('.face.back a[href]');
+    expect(cta?.getAttribute('href')).toContain('treko');
+  });
 
   it('a la structure flip-scene > flipper > face', () => {
-    const scene = fixture.nativeElement.querySelector('.flip-scene')
-    const flipper = scene?.querySelector('.flipper')
-    expect(flipper).toBeTruthy()
-    expect(flipper?.querySelector('.face.front')).toBeTruthy()
-    expect(flipper?.querySelector('.face.back')).toBeTruthy()
-  })
-})
+    const scene = fixture.nativeElement.querySelector('.flip-scene');
+    const flipper = scene?.querySelector('.flipper');
+    expect(flipper).toBeTruthy();
+    expect(flipper?.querySelector('.face.front')).toBeTruthy();
+    expect(flipper?.querySelector('.face.back')).toBeTruthy();
+  });
+});
 ```
 
 - [ ] **Step 2 — Run the spec to confirm it fails**
@@ -282,12 +282,8 @@ Expected: failures related to missing `.flip-scene`, `.face.front`, `.face.back`
 Replace the entire file content:
 
 ```html
-<article
-  class="flip-scene relative rounded-lg"
-  style="height: 220px;"
->
+<article class="flip-scene relative rounded-lg" style="height: 220px;">
   <div class="flipper rounded-lg">
-
     <!-- FACE AVANT -->
     <div
       class="face front justify-between
@@ -321,18 +317,17 @@ Replace the entire file content:
       <!-- Tech pills (aperçu) -->
       <div class="flex flex-wrap gap-1 mt-auto">
         @for (tech of project().techs.slice(0, 3); track tech) {
-          <span
-            class="text-[10px] px-2 py-0.5 rounded-full border
+        <span
+          class="text-[10px] px-2 py-0.5 rounded-full border
               bg-indigo-100 border-indigo-200 text-indigo-700
               dark:bg-indigo-950 dark:border-indigo-700 dark:text-indigo-300"
-          >
-            {{ tech }}
-          </span>
-        }
-        @if (project().techs.length > 3) {
-          <span class="text-[10px] text-indigo-400 dark:text-indigo-600 self-center">
-            +{{ project().techs.length - 3 }}
-          </span>
+        >
+          {{ tech }}
+        </span>
+        } @if (project().techs.length > 3) {
+        <span class="text-[10px] text-indigo-400 dark:text-indigo-600 self-center">
+          +{{ project().techs.length - 3 }}
+        </span>
         }
       </div>
 
@@ -353,7 +348,9 @@ Replace the entire file content:
             dark:bg-slate-950 dark:border-slate-800"
         >
           <p class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ project().year }}</p>
-          <p class="text-[9px] uppercase tracking-wide text-slate-400 dark:text-slate-500 mt-0.5">Année</p>
+          <p class="text-[9px] uppercase tracking-wide text-slate-400 dark:text-slate-500 mt-0.5">
+            Année
+          </p>
         </div>
         <div
           class="flex-1 text-center rounded-lg py-2 border
@@ -363,24 +360,28 @@ Replace the entire file content:
           <p class="text-[11px] font-bold text-blue-600 dark:text-blue-400">
             {{ i18n.t('projects.type.' + project().type) }}
           </p>
-          <p class="text-[9px] uppercase tracking-wide text-slate-400 dark:text-slate-500 mt-0.5">Type</p>
+          <p class="text-[9px] uppercase tracking-wide text-slate-400 dark:text-slate-500 mt-0.5">
+            Type
+          </p>
         </div>
       </div>
 
       <!-- Stack technique -->
       <div class="flex-1 flex flex-col gap-1 min-h-0">
-        <p class="text-[9px] font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-500">
+        <p
+          class="text-[9px] font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-500"
+        >
           Stack technique
         </p>
         <div class="flex flex-wrap gap-1">
           @for (tech of project().techs; track tech) {
-            <span
-              class="text-[10px] px-2 py-0.5 rounded-full border
+          <span
+            class="text-[10px] px-2 py-0.5 rounded-full border
                 bg-blue-50 border-blue-200 text-blue-700
                 dark:bg-blue-900/50 dark:border-blue-700 dark:text-blue-300"
-            >
-              {{ tech }}
-            </span>
+          >
+            {{ tech }}
+          </span>
           }
         </div>
       </div>
@@ -394,7 +395,6 @@ Replace the entire file content:
         {{ i18n.t('projects.viewProject') }} →
       </a>
     </div>
-
   </div>
 </article>
 ```
@@ -420,6 +420,7 @@ git commit -m "feat: add 3D card flip to ProjectCard"
 ## Task 4: Floating ambient on About
 
 **Files:**
+
 - Modify: `src/app/features/about/about.html`
 
 - [ ] **Step 1 — Wrap the about content in a floating card**
@@ -431,55 +432,55 @@ Replace the `@if (about(); as data)` block content div in `about.html`. The full
   <h1 class="text-3xl font-bold mb-8">{{ i18n.t('about.title') }}</h1>
 
   @if (about(); as data) {
-    <div
-      class="float-0 rounded-xl border p-6 space-y-6
+  <div
+    class="float-0 rounded-xl border p-6 space-y-6
         bg-white border-gray-200
         dark:bg-gray-900 dark:border-gray-700"
-    >
-      <div>
-        <h2 class="text-2xl font-semibold">{{ data.name }}</h2>
-        <p class="text-gray-500 dark:text-gray-400 mt-1">
-          {{ i18n.t('about.location') }} : {{ data.location }}
-        </p>
-      </div>
-
-      <p class="text-gray-700 dark:text-gray-300 leading-relaxed">{{ data.bio }}</p>
-
-      <div>
-        <h3 class="font-semibold mb-2">{{ i18n.t('about.links') }}</h3>
-        <ul class="flex gap-4">
-          <li>
-            <a
-              [href]="data.links.repoGit"
-              target="_blank"
-              rel="noopener"
-              class="text-blue-600 hover:underline dark:text-blue-400"
-              >GitHub</a
-            >
-          </li>
-          <li>
-            <a
-              [href]="data.links.gitlab"
-              target="_blank"
-              rel="noopener"
-              class="text-blue-600 hover:underline dark:text-blue-400"
-              >GitLab</a
-            >
-          </li>
-          <li>
-            <a
-              [href]="data.links.linkedin"
-              target="_blank"
-              rel="noopener"
-              class="text-blue-600 hover:underline dark:text-blue-400"
-              >LinkedIn</a
-            >
-          </li>
-        </ul>
-      </div>
+  >
+    <div>
+      <h2 class="text-2xl font-semibold">{{ data.name }}</h2>
+      <p class="text-gray-500 dark:text-gray-400 mt-1">
+        {{ i18n.t('about.location') }} : {{ data.location }}
+      </p>
     </div>
+
+    <p class="text-gray-700 dark:text-gray-300 leading-relaxed">{{ data.bio }}</p>
+
+    <div>
+      <h3 class="font-semibold mb-2">{{ i18n.t('about.links') }}</h3>
+      <ul class="flex gap-4">
+        <li>
+          <a
+            [href]="data.links.repoGit"
+            target="_blank"
+            rel="noopener"
+            class="text-blue-600 hover:underline dark:text-blue-400"
+            >GitHub</a
+          >
+        </li>
+        <li>
+          <a
+            [href]="data.links.gitlab"
+            target="_blank"
+            rel="noopener"
+            class="text-blue-600 hover:underline dark:text-blue-400"
+            >GitLab</a
+          >
+        </li>
+        <li>
+          <a
+            [href]="data.links.linkedin"
+            target="_blank"
+            rel="noopener"
+            class="text-blue-600 hover:underline dark:text-blue-400"
+            >LinkedIn</a
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
   } @else {
-    <p class="text-gray-400">Chargement...</p>
+  <p class="text-gray-400">Chargement...</p>
   }
 </section>
 ```
@@ -504,6 +505,7 @@ git commit -m "feat: add floating ambient animation to About card"
 ## Task 5: Staggered floating ambient on Experience
 
 **Files:**
+
 - Modify: `src/app/features/experience/experience.html`
 
 - [ ] **Step 1 — Add `$index` and the float class binding to the `@for` loop**
@@ -516,9 +518,9 @@ Replace the full content of `experience.html`:
 
   <div class="mt-6">
     @for (exp of experiences(); track exp.id; let i = $index) {
-      <app-timeline-item [experience]="exp" [class]="'float-' + (i % 4)" />
+    <app-timeline-item [experience]="exp" [class]="'float-' + (i % 4)" />
     } @empty {
-      <p class="text-gray-400">Chargement...</p>
+    <p class="text-gray-400">Chargement...</p>
     }
   </div>
 </section>
