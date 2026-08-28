@@ -1,5 +1,4 @@
-import { TestBed } from '@angular/core/testing';
-import { ComponentFixture } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { signal } from '@angular/core';
 import { ProjectCardComponent } from './project-card';

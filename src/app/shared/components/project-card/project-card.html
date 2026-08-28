@@ -1,4 +1,4 @@
-<article class="flip-scene relative rounded-lg" style="height: 220px">
+<article class="flip-scene relative rounded-lg" style="height: 220px" tabindex="0">
   <div class="flipper rounded-lg">
     <!-- FACE AVANT -->
     <div
@@ -42,7 +42,9 @@
         }
       </div>
 
-      <p class="text-[10px] text-center text-indigo-200 dark:text-indigo-900">← survolez →</p>
+      <p class="text-[10px] text-center text-indigo-200 dark:text-indigo-900" aria-hidden="true">
+        ← survolez →
+      </p>
     </div>
 
     <!-- FACE ARRIÈRE -->
@@ -56,7 +58,7 @@
         >
           <p class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ project().year }}</p>
           <p class="text-[9px] uppercase tracking-wide text-slate-400 dark:text-slate-500 mt-0.5">
-            Année
+            {{ i18n.t('projects.year') }}
           </p>
         </div>
         <div
@@ -66,7 +68,7 @@
             {{ i18n.t('projects.type.' + project().type) }}
           </p>
           <p class="text-[9px] uppercase tracking-wide text-slate-400 dark:text-slate-500 mt-0.5">
-            Type
+            {{ i18n.t('projects.typeLabel') }}
           </p>
         </div>
       </div>
@@ -76,7 +78,7 @@
         <p
           class="text-[9px] font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-500"
         >
-          Stack technique
+          {{ i18n.t('projects.stackTitle') }}
         </p>
         <div class="flex flex-wrap gap-1">
           @for (tech of project().techs; track tech) {

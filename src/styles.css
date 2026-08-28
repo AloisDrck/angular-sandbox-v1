@@ -23,6 +23,10 @@ body {
   transform: rotateY(180deg);
 }
 
+.flip-scene:focus-within .flipper {
+  transform: rotateY(180deg);
+}
+
 .face {
   position: absolute;
   inset: 0;
@@ -71,7 +75,8 @@ body {
   .flipper {
     transition: none;
   }
-  .flip-scene:hover .flipper {
+  .flip-scene:hover .flipper,
+  .flip-scene:focus-within .flipper {
     transform: none;
   }
   .float-0,
