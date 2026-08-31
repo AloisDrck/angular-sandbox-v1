@@ -38,16 +38,16 @@ src/app/
 
 ### Routes
 
-| Path | Composant | Chargement |
-|---|---|---|
-| `/` | Redirect → `/about` | — |
-| `/about` | `AboutComponent` | lazy |
-| `/experience` | `ExperienceComponent` | lazy |
-| `/projects` | `ProjectsComponent` | lazy |
-| `/projects/:id` | `ProjectDetailComponent` | lazy |
-| `/skills` | `SkillsComponent` | lazy |
-| `/contact` | `ContactComponent` | lazy |
-| `**` | `NotFoundComponent` | lazy |
+| Path            | Composant                | Chargement |
+| --------------- | ------------------------ | ---------- |
+| `/`             | Redirect → `/about`      | —          |
+| `/about`        | `AboutComponent`         | lazy       |
+| `/experience`   | `ExperienceComponent`    | lazy       |
+| `/projects`     | `ProjectsComponent`      | lazy       |
+| `/projects/:id` | `ProjectDetailComponent` | lazy       |
+| `/skills`       | `SkillsComponent`        | lazy       |
+| `/contact`      | `ContactComponent`       | lazy       |
+| `**`            | `NotFoundComponent`      | lazy       |
 
 ### Resolver — `ProjectResolver`
 
@@ -55,7 +55,7 @@ Sur la route `/projects/:id`, un resolver précharge les données du projet via 
 
 ```typescript
 export const projectResolver: ResolveFn<Project> = (route) =>
-  inject(PortfolioService).getProject(route.paramMap.get('id')!)
+  inject(PortfolioService).getProject(route.paramMap.get('id')!);
 ```
 
 ### Guard — `CanDeactivateGuard` sur Contact
@@ -63,8 +63,8 @@ export const projectResolver: ResolveFn<Project> = (route) =>
 Si l'utilisateur a commencé à saisir dans le formulaire de contact et tente de naviguer vers une autre page, un guard lui demande confirmation avant de quitter ("Votre message sera perdu.").
 
 ```typescript
-export const canDeactivateContact: CanDeactivateFn<ContactComponent> =
-  (component) => component.form.pristine || confirm('Quitter ? Votre message sera perdu.')
+export const canDeactivateContact: CanDeactivateFn<ContactComponent> = (component) =>
+  component.form.pristine || confirm('Quitter ? Votre message sera perdu.');
 ```
 
 **Concepts Angular couverts :** `loadComponent`, `ActivatedRoute`, `Router`, `ResolveFn`, `CanDeactivateFn`, paramètres de route dynamiques.
@@ -75,11 +75,11 @@ export const canDeactivateContact: CanDeactivateFn<ContactComponent> =
 
 ### Signals — état global UI
 
-| Service | Signal | Rôle |
-|---|---|---|
-| `ThemeService` | `theme: WritableSignal<'light' \| 'dark'>` | Thème actif, persisté en localStorage |
-| `I18nService` | `lang: WritableSignal<'fr' \| 'en'>` | Langue active |
-| `LoadingService` | `isLoading: WritableSignal<boolean>` | Indicateur de chargement global |
+| Service          | Signal                                     | Rôle                                  |
+| ---------------- | ------------------------------------------ | ------------------------------------- |
+| `ThemeService`   | `theme: WritableSignal<'light' \| 'dark'>` | Thème actif, persisté en localStorage |
+| `I18nService`    | `lang: WritableSignal<'fr' \| 'en'>`       | Langue active                         |
+| `LoadingService` | `isLoading: WritableSignal<boolean>`       | Indicateur de chargement global       |
 
 Un `effect()` dans `ThemeService` synchronise le signal avec `localStorage` et applique/retire la classe `.dark` sur `document.documentElement`.
 
@@ -88,12 +88,10 @@ Un `effect()` dans `ThemeService` synchronise le signal avec `localStorage` et a
 Sur la page Projets, un Signal `selectedTech` et un `computed()` dérivé gèrent le filtre par technologie :
 
 ```typescript
-selectedTech = signal<string | null>(null)
+selectedTech = signal<string | null>(null);
 filteredProjects = computed(() =>
-  this.projects().filter(p =>
-    !this.selectedTech() || p.techs.includes(this.selectedTech()!)
-  )
-)
+  this.projects().filter((p) => !this.selectedTech() || p.techs.includes(this.selectedTech()!)),
+);
 ```
 
 ### RxJS — couche HTTP (`PortfolioService`)
@@ -175,10 +173,10 @@ Chaque modèle est une interface TypeScript strictement typée partagée par tou
 
 ```typescript
 // environment.development.ts
-export const environment = { apiUrl: 'http://localhost:3000' }
+export const environment = { apiUrl: 'http://localhost:3000' };
 
 // environment.ts (production)
-export const environment = { apiUrl: 'https://ton-api.com' }
+export const environment = { apiUrl: 'https://ton-api.com' };
 ```
 
 ### Script de démarrage combiné
@@ -249,26 +247,28 @@ Tailwind v4 gère le dark mode via la classe `.dark` sur `<html>`. Le `ThemeServ
 ```typescript
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  private platformId = inject(PLATFORM_ID)
-  theme: WritableSignal<'light' | 'dark'>
+  private platformId = inject(PLATFORM_ID);
+  theme: WritableSignal<'light' | 'dark'>;
 
   constructor() {
     const initial = isPlatformBrowser(this.platformId)
-      ? (localStorage.getItem('theme') as 'light' | 'dark') ??
-        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-      : 'light'
+      ? ((localStorage.getItem('theme') as 'light' | 'dark') ??
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
+      : 'light';
 
-    this.theme = signal(initial)
+    this.theme = signal(initial);
 
     effect(() => {
       if (isPlatformBrowser(this.platformId)) {
-        document.documentElement.classList.toggle('dark', this.theme() === 'dark')
-        localStorage.setItem('theme', this.theme())
+        document.documentElement.classList.toggle('dark', this.theme() === 'dark');
+        localStorage.setItem('theme', this.theme());
       }
-    })
+    });
   }
 
-  toggle() { this.theme.update(t => t === 'dark' ? 'light' : 'dark') }
+  toggle() {
+    this.theme.update((t) => (t === 'dark' ? 'light' : 'dark'));
+  }
 }
 ```
 
@@ -282,13 +282,13 @@ Un composant `ThemeToggle` (icône soleil/lune) dans la navbar appelle `themeSer
 
 Un fichier `.spec.ts` par service ou composant critique, dans le même dossier que le fichier testé.
 
-| Cible | Type | Ce qu'on vérifie |
-|---|---|---|
-| `ThemeService` | Unitaire | Signal change, `localStorage` mis à jour, classe `.dark` appliquée |
-| `I18nService` | Unitaire | `t('key')` retourne le bon label selon la langue active |
-| `PortfolioService` | `HttpTestingController` | Bons endpoints appelés, données mappées correctement |
-| `ProjectsComponent` | Composant (`TestBed`) | Filtre par techno met à jour `filteredProjects` |
-| `CanDeactivateGuard` | Unitaire | Retourne `false` si formulaire dirty, `true` sinon |
+| Cible                | Type                    | Ce qu'on vérifie                                                   |
+| -------------------- | ----------------------- | ------------------------------------------------------------------ |
+| `ThemeService`       | Unitaire                | Signal change, `localStorage` mis à jour, classe `.dark` appliquée |
+| `I18nService`        | Unitaire                | `t('key')` retourne le bon label selon la langue active            |
+| `PortfolioService`   | `HttpTestingController` | Bons endpoints appelés, données mappées correctement               |
+| `ProjectsComponent`  | Composant (`TestBed`)   | Filtre par techno met à jour `filteredProjects`                    |
+| `CanDeactivateGuard` | Unitaire                | Retourne `false` si formulaire dirty, `true` sinon                 |
 
 **Concepts Angular couverts :** `TestBed`, `HttpTestingController`, tester des Signals, tester des guards.
 
@@ -296,13 +296,13 @@ Un fichier `.spec.ts` par service ou composant critique, dans le même dossier q
 
 ## 9. Sections du portfolio
 
-| Section | Route | Composants notables | Concepts Angular utilisés |
-|---|---|---|---|
-| À propos | `/about` | `AboutComponent` | `HttpClient`, `toSignal()`, binding simple |
-| Expériences | `/experience` | `ExperienceComponent`, `TimelineItemComponent` | `@for`, `@if`, composants réutilisables |
-| Projets | `/projects` | `ProjectsComponent`, `ProjectCardComponent`, `ProjectDetailComponent` | `computed()`, resolver, route params |
-| Compétences | `/skills` | `SkillsComponent`, `SkillBadgeComponent` | `@for` avec groupement, `computed()` |
-| Contact | `/contact` | `ContactComponent` | Reactive Forms, validators custom, `CanDeactivateGuard` |
+| Section     | Route         | Composants notables                                                   | Concepts Angular utilisés                               |
+| ----------- | ------------- | --------------------------------------------------------------------- | ------------------------------------------------------- |
+| À propos    | `/about`      | `AboutComponent`                                                      | `HttpClient`, `toSignal()`, binding simple              |
+| Expériences | `/experience` | `ExperienceComponent`, `TimelineItemComponent`                        | `@for`, `@if`, composants réutilisables                 |
+| Projets     | `/projects`   | `ProjectsComponent`, `ProjectCardComponent`, `ProjectDetailComponent` | `computed()`, resolver, route params                    |
+| Compétences | `/skills`     | `SkillsComponent`, `SkillBadgeComponent`                              | `@for` avec groupement, `computed()`                    |
+| Contact     | `/contact`    | `ContactComponent`                                                    | Reactive Forms, validators custom, `CanDeactivateGuard` |
 
 ---
 
@@ -316,18 +316,18 @@ npm install json-server concurrently --save-dev
 
 ## Résumé des concepts Angular couverts
 
-| Concept | Où |
-|---|---|
-| Standalone components | Partout |
-| Lazy loading | `app.routes.ts` |
-| Route params & navigation | `/projects/:id` |
-| `ResolveFn` | `ProjectResolver` |
-| `CanDeactivateFn` | `ContactComponent` |
-| `signal()`, `computed()`, `effect()` | `ThemeService`, `ProjectsComponent` |
-| `toSignal()`, `toObservable()` | `I18nService` |
-| `HttpClient` + RxJS (`.pipe`, `switchMap`, `catchError`) | `PortfolioService`, `I18nService` |
-| `HttpInterceptorFn` | `LoadingInterceptor` |
-| SSR + `isPlatformBrowser` | `ThemeService`, `I18nService` |
-| `TransferState` | `ProjectResolver` |
-| Reactive Forms + validators | `ContactComponent` |
-| `TestBed`, `HttpTestingController` | fichiers `.spec.ts` |
+| Concept                                                  | Où                                  |
+| -------------------------------------------------------- | ----------------------------------- |
+| Standalone components                                    | Partout                             |
+| Lazy loading                                             | `app.routes.ts`                     |
+| Route params & navigation                                | `/projects/:id`                     |
+| `ResolveFn`                                              | `ProjectResolver`                   |
+| `CanDeactivateFn`                                        | `ContactComponent`                  |
+| `signal()`, `computed()`, `effect()`                     | `ThemeService`, `ProjectsComponent` |
+| `toSignal()`, `toObservable()`                           | `I18nService`                       |
+| `HttpClient` + RxJS (`.pipe`, `switchMap`, `catchError`) | `PortfolioService`, `I18nService`   |
+| `HttpInterceptorFn`                                      | `LoadingInterceptor`                |
+| SSR + `isPlatformBrowser`                                | `ThemeService`, `I18nService`       |
+| `TransferState`                                          | `ProjectResolver`                   |
+| Reactive Forms + validators                              | `ContactComponent`                  |
+| `TestBed`, `HttpTestingController`                       | fichiers `.spec.ts`                 |
