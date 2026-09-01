@@ -3,10 +3,14 @@ import { projectResolver } from './features/projects/project.resolver';
 import { canDeactivateContact } from './features/contact/can-deactivate.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'about', pathMatch: 'full' },
+  {
+    path: '',
+    loadComponent: () => import('./features/adventure/adventure').then((m) => m.AdventureComponent),
+  },
   {
     path: 'about',
-    loadComponent: () => import('./features/about/about').then((m) => m.AboutComponent),
+    redirectTo: '',
+    pathMatch: 'full',
   },
   {
     path: 'experience',
