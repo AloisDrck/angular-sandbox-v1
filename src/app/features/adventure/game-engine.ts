@@ -472,9 +472,9 @@ export class GameEngineService implements OnDestroy {
 
   private drawBubble(c: CanvasRenderingContext2D, refuge: Refuge, scale: number): void {
     const bx = refuge.x;
-    const by = refuge.y - 30;
     const w = 110;
     const h = 38;
+    const by = Math.max(h, refuge.y - 30);
 
     c.save();
     c.translate(bx, by);
