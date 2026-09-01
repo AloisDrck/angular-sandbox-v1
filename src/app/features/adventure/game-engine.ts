@@ -11,6 +11,7 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import {
   CANVAS_W,
+  CANVAS_H,
   PLAYER_W,
   PLAYER_H,
   PLAYER_SPEED,
@@ -19,7 +20,11 @@ import {
   SPAWN_Y,
   REFUGES,
   TERRAIN_ZONES,
+  TRAIL_SEGMENTS,
+  SIGNPOSTS,
+  STAR_POSITIONS,
   Refuge,
+  Signpost,
 } from './scene-data';
 
 export interface SmokeParticle {
@@ -152,10 +157,224 @@ export class GameEngineService implements OnDestroy {
     this.stop();
   }
 
-  // Stubs — implemented in Tasks 4 and 5
   private buildOffscreen(): void {
-    /* implemented in Task 4 */
+    const oc = document.createElement('canvas');
+    oc.width = CANVAS_W;
+    oc.height = CANVAS_H;
+    const c = oc.getContext('2d')!;
+    this.offscreen = oc;
+
+    // Sky
+    c.fillStyle = '#0d0d1a';
+    c.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+    // Stars (static base — twinkling is per-frame)
+    c.fillStyle = '#ffffff';
+    for (const [sx, sy] of STAR_POSITIONS) {
+      c.fillRect(sx, sy, 2, 2);
+    }
+
+    // Moon
+    c.fillStyle = '#fde68a';
+    c.fillRect(430, 18, 18, 18);
+    c.fillStyle = '#0d0d1a';
+    c.globalAlpha = 0.45;
+    c.fillRect(434, 18, 10, 18);
+    c.globalAlpha = 1;
+
+    // Back mountains (distant, dark navy)
+    const backPeaks: [number, number, number, number, number, number][] = [
+      [0, 190, 70, 85, 150, 190],
+      [110, 190, 200, 70, 290, 190],
+      [260, 190, 360, 80, 440, 190],
+      [380, 190, 460, 95, 480, 190],
+    ];
+    c.fillStyle = '#1a1d3e';
+    for (const [x1, y1, x2, y2, x3, y3] of backPeaks) {
+      c.beginPath();
+      c.moveTo(x1, y1);
+      c.lineTo(x2, y2);
+      c.lineTo(x3, y3);
+      c.fill();
+    }
+
+    // Snow caps on back mountains
+    c.fillStyle = '#c7d2fe';
+    c.globalAlpha = 0.5;
+    const caps: [number, number, number, number, number, number][] = [
+      [63, 93, 70, 85, 77, 93],
+      [193, 78, 200, 70, 207, 78],
+      [353, 88, 360, 80, 367, 88],
+    ];
+    for (const [x1, y1, x2, y2, x3, y3] of caps) {
+      c.beginPath();
+      c.moveTo(x1, y1);
+      c.lineTo(x2, y2);
+      c.lineTo(x3, y3);
+      c.fill();
+    }
+    c.globalAlpha = 1;
+
+    // Main massif (3 overlapping polygons)
+    const massif: [number, number, number, number, number, number][] = [
+      [60, 320, 160, 110, 360, 320],
+      [200, 320, 310, 100, 420, 320],
+      [280, 320, 380, 120, 480, 320],
+    ];
+    const massifColors = ['#2a2d55', '#252850', '#2a2d55'];
+    for (let i = 0; i < massif.length; i++) {
+      const [x1, y1, x2, y2, x3, y3] = massif[i];
+      c.fillStyle = massifColors[i];
+      c.beginPath();
+      c.moveTo(x1, y1);
+      c.lineTo(x2, y2);
+      c.lineTo(x3, y3);
+      c.fill();
+    }
+
+    // Village foreground hill + ground
+    c.fillStyle = '#14532d';
+    c.beginPath();
+    c.moveTo(0, 280);
+    c.lineTo(80, 220);
+    c.lineTo(160, 280);
+    c.fill();
+    c.fillStyle = '#166534';
+    c.fillRect(0, 280, CANVAS_W, 20);
+    c.fillStyle = '#15803d';
+    c.fillRect(0, 290, CANVAS_W, 10);
+
+    // Trail
+    this.drawTrailOnCanvas(c);
+
+    // Virage dots
+    c.fillStyle = '#c9b458';
+    for (const [px, py] of [
+      [180, 240],
+      [90, 195],
+      [310, 148],
+      [330, 95],
+      [250, 72],
+    ] as [number, number][]) {
+      c.beginPath();
+      c.arc(px, py, 4, 0, Math.PI * 2);
+      c.fill();
+    }
+
+    // Bifurcation marker
+    c.fillStyle = '#f59e0b';
+    c.beginPath();
+    c.arc(230, 168, 6, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = '#0d0d1a';
+    c.beginPath();
+    c.arc(230, 168, 3, 0, Math.PI * 2);
+    c.fill();
+
+    // Signposts
+    for (const sp of SIGNPOSTS) this.drawSignpost(c, sp);
+
+    // Refuge buildings
+    for (const ref of REFUGES) this.drawRefugeBuilding(c, ref.x, ref.y, ref.id === 'skills');
+
+    // Decorative trees
+    const trees: [number, number][] = [
+      [20, 268],
+      [155, 252],
+      [100, 215],
+      [290, 152],
+    ];
+    for (const [tx, ty] of trees) this.drawTree(c, tx, ty);
   }
+
+  private drawTrailOnCanvas(c: CanvasRenderingContext2D): void {
+    c.strokeStyle = '#c9b458';
+    c.lineWidth = 3;
+    c.setLineDash([6, 4]);
+    for (let i = 0; i < TRAIL_SEGMENTS.length; i++) {
+      const [x1, y1, x2, y2] = TRAIL_SEGMENTS[i];
+      if (i === 4) {
+        c.lineWidth = 2;
+        c.globalAlpha = 0.5;
+      } else {
+        c.lineWidth = 3;
+        c.globalAlpha = 0.8;
+      }
+      c.beginPath();
+      c.moveTo(x1, y1);
+      c.lineTo(x2, y2);
+      c.stroke();
+    }
+    c.setLineDash([]);
+    c.globalAlpha = 1;
+    c.lineWidth = 1;
+  }
+
+  private drawRefugeBuilding(
+    c: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    snowCap = false,
+  ): void {
+    // House body
+    c.fillStyle = '#92400e';
+    c.fillRect(x - 9, y - 14, 18, 14);
+    // Roof
+    c.fillStyle = '#b45309';
+    c.beginPath();
+    c.moveTo(x - 13, y - 14);
+    c.lineTo(x, y - 26);
+    c.lineTo(x + 13, y - 14);
+    c.fill();
+    if (snowCap) {
+      c.fillStyle = '#e0e7ff';
+      c.globalAlpha = 0.6;
+      c.fillRect(x - 13, y - 15, 26, 3);
+      c.globalAlpha = 1;
+    }
+    // Door
+    c.fillStyle = '#1c1917';
+    c.fillRect(x - 2, y - 8, 4, 8);
+    // Window
+    c.fillStyle = '#fde68a';
+    c.globalAlpha = 0.8;
+    c.fillRect(x - 8, y - 11, 4, 4);
+    c.globalAlpha = 1;
+  }
+
+  private drawSignpost(c: CanvasRenderingContext2D, sp: Signpost): void {
+    const postH = 14 + sp.panels.length * 12;
+    // Post
+    c.fillStyle = '#92400e';
+    c.fillRect(sp.x, sp.y, 3, postH);
+
+    for (let i = 0; i < sp.panels.length; i++) {
+      const panel = sp.panels[i];
+      const py = sp.y + 14 + i * 12;
+      const panelW = Math.min(panel.label.length * 4.5 + 16, 90);
+      const panelX = panel.direction.includes('left') ? sp.x - panelW + 3 : sp.x + 3;
+      c.fillStyle = '#d97706';
+      c.fillRect(panelX, py, panelW, 10);
+      c.fillStyle = '#b45309';
+      c.fillRect(panelX + 1, py + 1, panelW - 2, 8);
+      c.fillStyle = '#fef3c7';
+      c.font = '4px monospace';
+      c.textAlign = 'left';
+      const arrow = panel.direction.includes('left') ? '← ' : '→ ';
+      c.fillText(`${arrow}${panel.label} ${panel.distance}`, panelX + 3, py + 7);
+    }
+  }
+
+  private drawTree(c: CanvasRenderingContext2D, x: number, y: number): void {
+    c.fillStyle = '#78350f';
+    c.fillRect(x, y, 4, 10);
+    c.fillStyle = '#15803d';
+    c.fillRect(x - 4, y - 13, 12, 15);
+    c.fillStyle = '#16a34a';
+    c.fillRect(x - 2, y - 19, 8, 8);
+  }
+
+  // Stub — implemented in Task 5
   private draw(): void {
     /* implemented in Task 5 */
   }
