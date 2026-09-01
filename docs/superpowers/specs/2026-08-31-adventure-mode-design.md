@@ -39,9 +39,9 @@ src/app/features/adventure/
 ### `AdventureComponent`
 
 - Monte le canvas via `@ViewChild('scene') canvas: ElementRef<HTMLCanvasElement>`
-- Démarre `GameEngine.start(canvas)` dans `ngAfterViewInit`
+- Restaure la position depuis `sessionStorage` puis démarre `GameEngine.start(canvas, initialX, initialY)` dans `ngAfterViewInit`
 - Appelle `GameEngine.stop()` dans `ngOnDestroy`
-- Écoute `keydown` sur `window` pour `Espace`/`Entrée` → `router.navigate()`
+- Écoute `keydown` sur `window` pour `Espace`/`Entrée` → `GameEngine.savePosition()` puis `router.navigate()`
 - Charge les données About via `PortfolioService.getAbout()` (`toSignal`) et les passe à `GameEngine`
 - Affiche un `<button>` HTML en `position: absolute` au-dessus du canvas quand `nearbyRefuge()` est non-nul
 
@@ -66,38 +66,61 @@ Signals exposés :
 
 ### Couches de rendu
 
-1. **Fond statique (offscreen canvas)** — dessiné une seule fois au chargement : ciel étoilé, lune, montagnes arrière (2 couches), terrain en paliers, arbres, sentier.
+1. **Fond statique (offscreen canvas)** — dessiné une seule fois au chargement : ciel étoilé, lune, montagnes arrière (2 couches), terrain en paliers, arbres, sentier en lacets, pancartes.
 2. **Effets ambiants** — redessinés chaque frame : particules de fumée (3 par refuge), étoiles clignotantes (`sin(time)`), oscillation des bâtons du randonneur au repos.
 3. **Joueur** — redessiné chaque frame avec animation de marche (2 frames alternées toutes les 200ms, ou idle).
 4. **Bulle de dialogue** — dessinée par-dessus quand `nearbyRefuge !== null`, avec scale animée.
 
-### Disposition des éléments
+### Disposition des éléments — sentier en lacets
+
+Le sentier monte en zigzag irrégulier depuis le bas-gauche jusqu'au sommet. Une bifurcation permet d'accéder à Contact en raccourci. Les refuges sont répartis à différentes altitudes.
 
 ```
-Sommet          ────────────── [Refuge Compétences] x=461 y=110
-                              ↗ montée
-Plateau 2   ──────────── [Refuge Projets] x=358 y=143
-                         ↗ montée
-Plateau 1   ──────── [Refuge Expériences] x=217 y=178
-                     ↗ montée
-Village    [Contact] [Pancarte À propos] [Randonneur départ]
-           x=18 y=238  x=37 y=230         x=72 y=220
+Sommet (droite)   ○──────────────── [Compétences] x=370 y=55
+                  ↗ lacet 4
+              ○── [Projets] x=250 y=72
+              ↖ lacet 3
+        [Expériences] ──○ x=210 y=120
+x=330 y=95 virage 4 ↗
+          ○──────── virage 3 x=310 y=148
+          ↖ lacet 2
+    [Contact] ←──── BIFURCATION x=230 y=168 ──→ lacet 2 continue
+    x=137 y=215     ↑ branche secondaire
+          virage 2 ○ x=90 y=195
+          ↗ lacet 1
+    virage 1 ○ x=180 y=240
+    ↖ départ
+[Randonneur spawn] x=55 y=278
 ```
+
+Tronçons du sentier (tracés en tirets ocre `#c9b458`, largeur 3px) :
+
+| # | De | À | Direction |
+|---|---|---|---|
+| 0 | Spawn (55, 278) | Virage 1 (180, 240) | ↗ diagonal |
+| 1 | Virage 1 | Virage 2 (90, 195) | ↖ diagonal |
+| 2 | Virage 2 | Bifurcation (230, 168) | ↗ diagonal |
+| 3a | Bifurcation | Virage 3 (310, 148) | → légèrement haut *(branche principale)* |
+| 3b | Bifurcation | Contact (137, 215) | ↙ *(branche secondaire, tirets fins)* |
+| 4 | Virage 3 | Expériences (210, 120) | ↖ |
+| 5 | Expériences | Virage 4 (330, 95) | ↗ |
+| 6 | Virage 4 | Projets (250, 72) | ↖ |
+| 7 | Projets | Compétences (370, 55) | ↗ *(sommet)* |
 
 ### Zone de déplacement — terrain walkable
 
-Le joueur se déplace librement en 4 directions (←→↑↓) dans une bande praticable définie par colonnes X. La bande simule le relief : plus on avance à droite (vers le sommet), plus on peut monter haut.
+Le joueur se déplace librement en 4 directions (←→↑↓) dans une bande praticable définie par colonnes X. Les bornes sont volontairement larges pour permettre à l'utilisateur d'explorer hors du sentier (effet immersif), mais restent cohérentes avec le terrain montagneux.
 
 | Zone X | Y minimum (plafond) | Y maximum (sol) | Description |
 |---|---|---|---|
-| 20 → 100 | 180 | 260 | Village — terrain plat bas |
-| 100 → 180 | 150 | 250 | Lacet 1 — zone de montée |
-| 180 → 260 | 130 | 225 | Plateau Expériences |
-| 260 → 330 | 105 | 215 | Lacet 2 — zone de montée |
-| 330 → 400 | 90 | 190 | Plateau Projets |
-| 400 → 480 | 65 | 160 | Zone sommet — Compétences |
+| 20 → 100 | 165 | 285 | Village — bas de montagne |
+| 100 → 180 | 140 | 265 | Lacet 1 — première montée |
+| 180 → 260 | 120 | 240 | Zone bifurcation / Expériences |
+| 260 → 330 | 90 | 210 | Lacet 3 — montée raide |
+| 330 → 400 | 68 | 175 | Zone Projets / Virage 4 |
+| 400 → 480 | 45 | 145 | Zone sommet — Compétences |
 
-Le joueur ne peut pas sortir de x=20 à x=480, ni dépasser le plafond ou le sol de sa zone X courante. Le sentier dessiné dans le décor est un guide visuel indicatif, pas une contrainte physique.
+Le joueur ne peut pas sortir de x=20 à x=480, ni dépasser le plafond ou le sol de sa zone X courante. Le sentier dessiné est un guide visuel indicatif, pas une contrainte physique.
 
 ---
 
@@ -115,21 +138,62 @@ interface Refuge {
 
 const REFUGES: Refuge[] = [
   { id: 'contact',    label: 'Contact',      route: '/contact',
-    x: 18,  y: 238, stat: 'Envoyez un message' },
+    x: 137, y: 215, stat: 'Envoyez un message' },
   { id: 'experience', label: 'Expériences',  route: '/experience',
-    x: 217, y: 178, stat: '4 expériences · 2021–2024' },
+    x: 210, y: 120, stat: '4 expériences · 2021–2024' },
   { id: 'projects',   label: 'Projets',      route: '/projects',
-    x: 358, y: 143, stat: '6 projets · Angular · Python' },
+    x: 250, y: 72,  stat: '6 projets · Angular · Python' },
   { id: 'skills',     label: 'Compétences',  route: '/skills',
-    x: 461, y: 110, stat: '14 compétences' },
+    x: 370, y: 55,  stat: '14 compétences' },
 ];
 
 const PROXIMITY_RADIUS = 40; // px logiques
 ```
 
+## 5. Pancartes d'indication (signposts)
+
+Des pancartes pixel art (poteau bois + lames directionnelles) sont placées aux virages et à la bifurcation. Elles indiquent le nom du refuge, la direction, et une distance approximative.
+
+```typescript
+interface SignpostPanel {
+  direction: 'left' | 'right' | 'up-left' | 'up-right';
+  label: string;   // ex: "Expériences"
+  distance: string; // ex: "~200m"
+}
+
+interface Signpost {
+  x: number;
+  y: number;
+  panels: SignpostPanel[];
+}
+
+const SIGNPOSTS: Signpost[] = [
+  {
+    x: 90, y: 195,
+    panels: [{ direction: 'up-right', label: 'Expériences', distance: '~200m' }],
+  },
+  {
+    x: 230, y: 168,
+    panels: [
+      { direction: 'up-right', label: 'Expériences / Projets / Compétences', distance: '→' },
+      { direction: 'down-left', label: 'Contact', distance: '~80m' },
+    ],
+  },
+  {
+    x: 310, y: 148,
+    panels: [
+      { direction: 'up-left', label: 'Projets',      distance: '~120m' },
+      { direction: 'up-left', label: 'Compétences',  distance: '~250m' },
+    ],
+  },
+];
+```
+
+Dessin pixel art : poteau `#92400e` (3px wide), lames `#d97706` (fond) + `#b45309` (corps), texte `#fef3c7` (4px). Dessiné dans l'offscreen canvas (statique).
+
 ---
 
-## 5. Game loop
+## 6. Game loop
 
 ```typescript
 private loop(timestamp: number): void {
@@ -167,7 +231,7 @@ private loop(timestamp: number): void {
 
 ---
 
-## 6. Personnage — pixel art procédural
+## 7. Personnage — pixel art procédural
 
 Dessiné en rectangles `ctx.fillRect`. Dimensions : 8×18 px logiques.
 
@@ -187,7 +251,7 @@ Dessiné en rectangles `ctx.fillRect`. Dimensions : 8×18 px logiques.
 
 ---
 
-## 7. Bulle de dialogue
+## 8. Bulle de dialogue
 
 Rectangle avec coins arrondis au-dessus du refuge + pointe triangulaire vers le bas.
 
@@ -202,7 +266,7 @@ Couleurs : fond `#1e293b`, bordure `#6366f1`, texte `#a5b4fc` / `#94a3b8` / `#63
 
 ---
 
-## 8. Pancarte À propos
+## 9. Pancarte À propos
 
 Dessinée en canvas à x=18, y=200. Structure bois pixel art (rectangles `#d97706` / `#b45309`).
 
@@ -215,7 +279,7 @@ Les liens GitHub/LinkedIn sont des `<a>` HTML en `position: absolute` superposé
 
 ---
 
-## 9. Interactions clavier
+## 10. Interactions clavier
 
 | Touche | Action |
 |---|---|
@@ -233,7 +297,32 @@ Bouton HTML cliquable superposé en `position: absolute` pour les utilisateurs s
 
 ---
 
-## 10. Accessibilité & responsive
+## 11. Persistance de la position
+
+Quand l'utilisateur entre dans un refuge (navigation Angular vers une section), puis revient sur la page d'accueil Adventure, il retrouve sa position exacte — pas le point de départ.
+
+**Implémentation via `sessionStorage`** (persistance dans l'onglet, réinitialisation sur nouvelle session) :
+
+```typescript
+// Dans GameEngine, au moment de la navigation (avant router.navigate)
+savePosition(): void {
+  sessionStorage.setItem('adventure_x', String(this.playerX()));
+  sessionStorage.setItem('adventure_y', String(this.playerY()));
+}
+
+// Dans AdventureComponent.ngAfterViewInit, avant GameEngine.start()
+restorePosition(): { x: number; y: number } {
+  const x = Number(sessionStorage.getItem('adventure_x') ?? SPAWN_X);
+  const y = Number(sessionStorage.getItem('adventure_y') ?? SPAWN_Y);
+  return { x: isNaN(x) ? SPAWN_X : x, y: isNaN(y) ? SPAWN_Y : y };
+}
+```
+
+`SPAWN_X = 55`, `SPAWN_Y = 278` (point de départ initial bas-gauche).
+
+`savePosition()` est appelé **avant** `router.navigate()` dans le handler Espace/Entrée. La position est restaurée dans `GameEngine.start(canvas, initialX, initialY)`.
+
+## 12. Accessibilité & responsive
 
 - `prefers-reduced-motion: reduce` : désactive la fumée et les étoiles clignotantes (scène statique)
 - Canvas mis à l'échelle CSS : `width: 100%; max-width: 960px; height: auto` — ratio préservé
@@ -242,10 +331,10 @@ Bouton HTML cliquable superposé en `position: absolute` pour les utilisateurs s
 
 ---
 
-## 11. Hors scope
+## 13. Hors scope
 
 - Contrôles tactiles / joystick mobile (version future)
 - Animations d'entrée dans un refuge (fondu, transition visuelle)
 - Sons / musique
-- Sauvegarde de la position du joueur entre sessions
+- Persistance de la position entre sessions (onglets différents ou rechargement complet) — `sessionStorage` suffit pour v1
 - Tilemap externe (Tiled) — décor dessiné en code pur
