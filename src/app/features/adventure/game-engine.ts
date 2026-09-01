@@ -1,5 +1,13 @@
 // src/app/features/adventure/game-engine.ts
-import { Injectable, PLATFORM_ID, inject, signal, WritableSignal } from '@angular/core';
+import {
+  Injectable,
+  PLATFORM_ID,
+  OnDestroy,
+  inject,
+  signal,
+  Signal,
+  WritableSignal,
+} from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import {
   CANVAS_W,
@@ -22,13 +30,18 @@ export interface SmokeParticle {
 }
 
 @Injectable()
-export class GameEngineService {
+export class GameEngineService implements OnDestroy {
   private platformId = inject(PLATFORM_ID);
 
-  readonly playerX: WritableSignal<number> = signal(SPAWN_X);
-  readonly playerY: WritableSignal<number> = signal(SPAWN_Y);
-  readonly nearbyRefuge: WritableSignal<Refuge | null> = signal(null);
-  readonly bubbleScale: WritableSignal<number> = signal(0);
+  private readonly _playerX: WritableSignal<number> = signal(SPAWN_X);
+  private readonly _playerY: WritableSignal<number> = signal(SPAWN_Y);
+  private readonly _nearbyRefuge: WritableSignal<Refuge | null> = signal(null);
+  private readonly _bubbleScale: WritableSignal<number> = signal(0);
+
+  readonly playerX: Signal<number> = this._playerX.asReadonly();
+  readonly playerY: Signal<number> = this._playerY.asReadonly();
+  readonly nearbyRefuge: Signal<Refuge | null> = this._nearbyRefuge.asReadonly();
+  readonly bubbleScale: Signal<number> = this._bubbleScale.asReadonly();
 
   readonly keysPressed = new Set<string>();
   private facing: 'left' | 'right' = 'right';
@@ -42,8 +55,8 @@ export class GameEngineService {
   private offscreen: HTMLCanvasElement | null = null;
 
   initPosition(x: number, y: number): void {
-    this.playerX.set(x);
-    this.playerY.set(y);
+    this._playerX.set(x);
+    this._playerY.set(y);
   }
 
   update(dt: number): void {
@@ -60,15 +73,15 @@ export class GameEngineService {
     if (dx > 0) this.facing = 'right';
     if (dx < 0) this.facing = 'left';
 
-    const nx = Math.max(20, Math.min(CANVAS_W - PLAYER_W, this.playerX() + dx));
+    const nx = Math.max(20, Math.min(CANVAS_W - PLAYER_W, this._playerX() + dx));
 
     const zone =
       TERRAIN_ZONES.find((z) => nx >= z.xMin && nx < z.xMax) ??
       TERRAIN_ZONES[TERRAIN_ZONES.length - 1];
-    const ny = Math.max(zone.yMin, Math.min(zone.yMax - PLAYER_H, this.playerY() + dy));
+    const ny = Math.max(zone.yMin, Math.min(zone.yMax - PLAYER_H, this._playerY() + dy));
 
-    this.playerX.set(nx);
-    this.playerY.set(ny);
+    this._playerX.set(nx);
+    this._playerY.set(ny);
 
     if (dx !== 0 || dy !== 0) {
       this.walkTimer += dt;
@@ -80,14 +93,14 @@ export class GameEngineService {
 
     this.updateSmoke(dt);
 
-    const px = this.playerX();
-    const py = this.playerY();
+    const px = this._playerX();
+    const py = this._playerY();
     const nearby = REFUGES.find((r) => Math.hypot(px - r.x, py - r.y) < PROXIMITY_RADIUS) ?? null;
-    this.nearbyRefuge.set(nearby);
+    this._nearbyRefuge.set(nearby);
 
     const targetScale = nearby ? 1 : 0;
-    const current = this.bubbleScale();
-    this.bubbleScale.set(current + (targetScale - current) * Math.min(10 * dt, 1));
+    const current = this._bubbleScale();
+    this._bubbleScale.set(current + (targetScale - current) * Math.min(10 * dt, 1));
   }
 
   private updateSmoke(dt: number): void {
@@ -122,8 +135,8 @@ export class GameEngineService {
   }
 
   savePosition(): void {
-    sessionStorage.setItem('adventure_x', String(this.playerX()));
-    sessionStorage.setItem('adventure_y', String(this.playerY()));
+    sessionStorage.setItem('adventure_x', String(this._playerX()));
+    sessionStorage.setItem('adventure_y', String(this._playerY()));
   }
 
   restorePosition(): { x: number; y: number } {
@@ -133,6 +146,10 @@ export class GameEngineService {
       x: isFinite(x) && x > 0 ? x : SPAWN_X,
       y: isFinite(y) && y > 0 ? y : SPAWN_Y,
     };
+  }
+
+  ngOnDestroy(): void {
+    this.stop();
   }
 
   // Stubs — implemented in Tasks 4 and 5
