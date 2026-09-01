@@ -374,8 +374,164 @@ export class GameEngineService implements OnDestroy {
     c.fillRect(x - 2, y - 19, 8, 8);
   }
 
-  // Stub — implemented in Task 5
   private draw(): void {
-    /* implemented in Task 5 */
+    if (!this.ctx || !this.offscreen) return;
+    const c = this.ctx;
+
+    // Layer 1: static background
+    c.drawImage(this.offscreen, 0, 0);
+
+    // Layer 2: twinkling stars
+    for (const [sx, sy, baseAlpha] of STAR_POSITIONS) {
+      c.globalAlpha = baseAlpha * (0.7 + 0.3 * Math.sin(this.time * 2 + sx));
+      c.fillStyle = '#ffffff';
+      c.fillRect(sx, sy, 2, 2);
+    }
+    c.globalAlpha = 1;
+
+    // Layer 3: smoke particles
+    for (const p of this.smokeParticles) {
+      c.globalAlpha = p.alpha;
+      c.fillStyle = '#9ca3af';
+      c.fillRect(p.x, p.y, 2, 2);
+    }
+    c.globalAlpha = 1;
+
+    // Layer 4: refuge labels
+    c.font = 'bold 5px monospace';
+    c.textAlign = 'center';
+    for (const ref of REFUGES) {
+      c.fillStyle = '#1e1b4b';
+      c.globalAlpha = 0.9;
+      c.fillRect(ref.x - 20, ref.y + 2, 40, 8);
+      c.globalAlpha = 1;
+      c.fillStyle = '#a5b4fc';
+      c.fillText(ref.label, ref.x, ref.y + 9);
+    }
+
+    // Layer 5: player
+    this.drawPlayer(c);
+
+    // Layer 6: speech bubble
+    const scale = this.bubbleScale();
+    const refuge = this.nearbyRefuge();
+    if (scale > 0.05 && refuge) {
+      this.drawBubble(c, refuge, scale);
+    }
+  }
+
+  private drawPlayer(c: CanvasRenderingContext2D): void {
+    const px = this._playerX();
+    const py = this._playerY();
+    const flip = this.facing === 'left';
+    const isMoving =
+      this.keysPressed.has('ArrowLeft') ||
+      this.keysPressed.has('ArrowRight') ||
+      this.keysPressed.has('ArrowUp') ||
+      this.keysPressed.has('ArrowDown');
+
+    c.save();
+    if (flip) {
+      c.translate(px + PLAYER_W, 0);
+      c.scale(-1, 1);
+      c.translate(-px, 0);
+    }
+
+    // Hat
+    c.fillStyle = '#b45309';
+    c.fillRect(px, py, PLAYER_W, 4);
+    // Head
+    c.fillStyle = '#fcd34d';
+    c.fillRect(px + 1, py + 4, PLAYER_W - 2, 7);
+    // Body (jacket)
+    c.fillStyle = '#16a34a';
+    c.fillRect(px, py + 11, PLAYER_W, 6);
+    // Backpack
+    c.fillStyle = '#78350f';
+    c.fillRect(px + 7, py + 9, 4, 6);
+    // Legs
+    c.fillStyle = '#1d4ed8';
+    if (!isMoving) {
+      c.fillRect(px + 1, py + 17, 4, 5);
+      c.fillRect(px + 5, py + 17, 4, 5);
+    } else if (this.walkFrame === 0) {
+      c.fillRect(px, py + 17, 4, 5); // left leg forward
+      c.fillRect(px + 5, py + 15, 4, 5); // right leg back
+    } else {
+      c.fillRect(px + 5, py + 17, 4, 5); // right leg forward
+      c.fillRect(px, py + 15, 4, 5); // left leg back
+    }
+    // Hiking poles
+    c.fillStyle = '#a3a3a3';
+    const poleWobble = isMoving ? 0 : Math.sin(this.time * 2) * 1;
+    c.fillRect(px - 2, py + 13 + poleWobble, 2, 9);
+    c.fillRect(px + PLAYER_W, py + 13 - poleWobble, 2, 9);
+
+    c.restore();
+  }
+
+  private drawBubble(c: CanvasRenderingContext2D, refuge: Refuge, scale: number): void {
+    const bx = refuge.x;
+    const by = refuge.y - 30;
+    const w = 110;
+    const h = 38;
+
+    c.save();
+    c.translate(bx, by);
+    c.scale(scale, scale);
+    c.translate(-bx, -by);
+
+    // Bubble background
+    c.fillStyle = '#1e293b';
+    c.strokeStyle = '#6366f1';
+    c.lineWidth = 1.5;
+    this.drawRoundedRect(c, bx - w / 2, by - h, w, h, 5);
+    c.fill();
+    c.stroke();
+
+    // Pointer triangle
+    c.fillStyle = '#1e293b';
+    c.beginPath();
+    c.moveTo(bx - 5, by);
+    c.lineTo(bx + 5, by);
+    c.lineTo(bx, by + 6);
+    c.fill();
+    c.strokeStyle = '#6366f1';
+    c.stroke();
+
+    // Text
+    c.textAlign = 'center';
+    c.font = 'bold 5px monospace';
+    c.fillStyle = '#a5b4fc';
+    c.fillText(`📋 ${refuge.label}`, bx, by - h + 10);
+    c.font = '4px monospace';
+    c.fillStyle = '#94a3b8';
+    c.fillText(refuge.stat, bx, by - h + 20);
+    c.fillStyle = '#6366f1';
+    c.font = 'bold 4px monospace';
+    c.fillText('[ ESPACE ] entrer', bx, by - h + 31);
+
+    c.restore();
+  }
+
+  private drawRoundedRect(
+    c: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    r: number,
+  ): void {
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.lineTo(x + w - r, y);
+    c.arcTo(x + w, y, x + w, y + r, r);
+    c.lineTo(x + w, y + h - r);
+    c.arcTo(x + w, y + h, x + w - r, y + h, r);
+    c.lineTo(x + r, y + h);
+    c.arcTo(x, y + h, x, y + h - r, r);
+    c.lineTo(x, y + r);
+    c.arcTo(x, y, x + r, y, r);
+    c.closePath();
   }
 }
