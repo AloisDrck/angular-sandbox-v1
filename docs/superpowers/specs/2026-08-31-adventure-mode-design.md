@@ -52,7 +52,7 @@ Signals exposés :
 | Signal | Type | Description |
 |---|---|---|
 | `playerX` | `WritableSignal<number>` | Position X du joueur |
-| `playerY` | `WritableSignal<number>` | Position Y calculée depuis la path function |
+| `playerY` | `WritableSignal<number>` | Position Y du joueur, contrôlée par ↑↓ et contrainte par le terrain |
 | `nearbyRefuge` | `WritableSignal<Refuge \| null>` | Refuge dans le rayon de proximité |
 | `bubbleScale` | `WritableSignal<number>` | 0→1, animation d'apparition de la bulle |
 
@@ -84,21 +84,20 @@ Village    [Contact] [Pancarte À propos] [Randonneur départ]
            x=18 y=238  x=37 y=230         x=72 y=220
 ```
 
-### Sentier — path function `getPathY(x): number`
+### Zone de déplacement — terrain walkable
 
-Interpolation linéaire par morceaux :
+Le joueur se déplace librement en 4 directions (←→↑↓) dans une bande praticable définie par colonnes X. La bande simule le relief : plus on avance à droite (vers le sommet), plus on peut monter haut.
 
-| Segment X | Y début | Y fin | Description |
+| Zone X | Y minimum (plafond) | Y maximum (sol) | Description |
 |---|---|---|---|
-| 20 → 100 | 226 | 226 | Plat — village |
-| 100 → 180 | 226 | 200 | Montée lacet 1 |
-| 180 → 260 | 200 | 200 | Plateau Expériences |
-| 260 → 330 | 200 | 168 | Montée lacet 2 |
-| 330 → 400 | 168 | 168 | Plateau Projets |
-| 400 → 474 | 168 | 138 | Montée sommet |
-| 474 → 510 | 138 | 138 | Sommet Compétences |
+| 20 → 100 | 180 | 260 | Village — terrain plat bas |
+| 100 → 180 | 150 | 250 | Lacet 1 — zone de montée |
+| 180 → 260 | 130 | 225 | Plateau Expériences |
+| 260 → 330 | 105 | 215 | Lacet 2 — zone de montée |
+| 330 → 400 | 90 | 190 | Plateau Projets |
+| 400 → 480 | 65 | 160 | Zone sommet — Compétences |
 
-Le joueur ne peut pas sortir de x=20 à x=510.
+Le joueur ne peut pas sortir de x=20 à x=480, ni dépasser le plafond ou le sol de sa zone X courante. Le sentier dessiné dans le décor est un guide visuel indicatif, pas une contrainte physique.
 
 ---
 
@@ -146,13 +145,17 @@ private loop(timestamp: number): void {
 
 1. Lire les touches actives (`Set<string>`)
 2. Calculer `dx = speed * dt` (speed = 120 px/s) selon `ArrowLeft`/`ArrowRight`
-3. Clamp `playerX` dans [20, 510]
-4. `playerY = getPathY(playerX) - PLAYER_HEIGHT`
-5. Mettre à jour `facing` (`'left'` | `'right'`)
-6. Avancer le compteur d'animation de marche
-7. Mettre à jour les particules de fumée
-8. Détecter `nearbyRefuge` via `Math.hypot`
-9. Animer `bubbleScale` : `lerp(current, target, 10 * dt)` — target = 1 si refuge proche, 0 sinon
+3. Calculer `dy = speed * dt` (même speed) selon `ArrowUp`/`ArrowDown`
+4. Appliquer `dx` et `dy` à la position candidate `(nx, ny)`
+5. Clamp `nx` dans [20, 480]
+6. Déterminer la zone walkable pour `nx` → `[yMin, yMax]`
+7. Clamp `ny` dans `[yMin, yMax - PLAYER_HEIGHT]`
+8. Mettre à jour `playerX` et `playerY`
+9. Mettre à jour `facing` selon le dernier déplacement horizontal (`'left'` | `'right'`)
+10. Avancer le compteur d'animation de marche si `dx !== 0 || dy !== 0`
+11. Mettre à jour les particules de fumée
+12. Détecter `nearbyRefuge` via `Math.hypot`
+13. Animer `bubbleScale` : `lerp(current, target, 10 * dt)` — target = 1 si refuge proche, 0 sinon
 
 ### `draw()`
 
@@ -218,10 +221,13 @@ Les liens GitHub/LinkedIn sont des `<a>` HTML en `position: absolute` superposé
 |---|---|
 | `ArrowLeft` | Déplacement gauche |
 | `ArrowRight` | Déplacement droit |
-| `ArrowUp` / `ArrowDown` | Ignoré |
+| `ArrowUp` | Déplacement vers le haut (montée) |
+| `ArrowDown` | Déplacement vers le bas (descente) |
 | `Space` | Entrer dans le refuge proche (si bulle visible) |
 | `Enter` | Entrer dans le refuge proche (si bulle visible) |
 | `Escape` | Ferme la bulle sans bouger le joueur |
+
+Combinaisons simultanées supportées (ex : `ArrowRight` + `ArrowUp` = déplacement diagonal).
 
 Bouton HTML cliquable superposé en `position: absolute` pour les utilisateurs sans clavier.
 
