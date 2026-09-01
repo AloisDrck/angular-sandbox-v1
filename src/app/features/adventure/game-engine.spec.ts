@@ -60,3 +60,36 @@ describe('GameEngineService — update()', () => {
     expect(engine.nearbyRefuge()).toBeNull();
   });
 });
+
+describe('GameEngineService — position persistence', () => {
+  let engine: GameEngineService;
+
+  beforeEach(() => {
+    sessionStorage.clear();
+    TestBed.configureTestingModule({
+      providers: [GameEngineService, { provide: PLATFORM_ID, useValue: 'browser' }],
+    });
+    engine = TestBed.inject(GameEngineService);
+  });
+
+  it('savePosition écrit dans sessionStorage', () => {
+    engine.initPosition(150, 200);
+    engine.savePosition();
+    expect(sessionStorage.getItem('adventure_x')).toBe('150');
+    expect(sessionStorage.getItem('adventure_y')).toBe('200');
+  });
+
+  it('restorePosition lit depuis sessionStorage', () => {
+    sessionStorage.setItem('adventure_x', '220');
+    sessionStorage.setItem('adventure_y', '130');
+    const pos = engine.restorePosition();
+    expect(pos.x).toBe(220);
+    expect(pos.y).toBe(130);
+  });
+
+  it('restorePosition retourne SPAWN si sessionStorage vide', () => {
+    const pos = engine.restorePosition();
+    expect(pos.x).toBe(SPAWN_X);
+    expect(pos.y).toBe(SPAWN_Y);
+  });
+});
