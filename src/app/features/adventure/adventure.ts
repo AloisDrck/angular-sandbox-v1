@@ -19,10 +19,12 @@ import { GameEngineService } from './game-engine';
 })
 export class AdventureComponent implements AfterViewInit, OnDestroy {
   @ViewChild('scene') private canvasRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('textLayer') private textLayerRef!: ElementRef<HTMLCanvasElement>;
 
   protected engine = inject(GameEngineService);
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
+  private resizeObserver: ResizeObserver | null = null;
 
   private onKeyDown = (e: KeyboardEvent) => {
     const nav = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space', 'Enter', 'Escape'];
@@ -42,11 +44,17 @@ export class AdventureComponent implements AfterViewInit, OnDestroy {
     if (!isPlatformBrowser(this.platformId)) return;
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('keyup', this.onKeyUp);
+    const textCanvas = this.textLayerRef.nativeElement;
     const { x, y } = this.engine.restorePosition();
-    this.engine.start(this.canvasRef.nativeElement, x, y);
+    this.engine.start(this.canvasRef.nativeElement, textCanvas, x, y);
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => this.engine.resize(textCanvas));
+      this.resizeObserver.observe(textCanvas);
+    }
   }
 
   ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
     this.engine.stop();
     if (isPlatformBrowser(this.platformId)) {
       window.removeEventListener('keydown', this.onKeyDown);

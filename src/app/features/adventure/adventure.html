@@ -1,11 +1,14 @@
-<div class="relative w-full flex justify-center">
+<div class="fixed inset-0 top-14 z-10">
+  <!-- Pixel art canvas (scaled pixelated) -->
   <canvas
     #scene
     [attr.width]="480"
     [attr.height]="300"
-    class="w-full max-w-3xl h-auto block border border-gray-700 rounded-lg"
+    class="w-full h-full block"
     style="image-rendering: pixelated; image-rendering: crisp-edges"
   ></canvas>
+  <!-- Crisp text overlay (native DPI, no pixelation) -->
+  <canvas #textLayer class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
 
   @if (engine.bubbleScale() > 0.05 && engine.nearbyRefuge()) {
     <button

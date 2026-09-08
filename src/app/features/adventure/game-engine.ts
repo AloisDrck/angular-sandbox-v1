@@ -58,6 +58,8 @@ export class GameEngineService implements OnDestroy {
   private canvas: HTMLCanvasElement | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
   private offscreen: HTMLCanvasElement | null = null;
+  private textCanvas: HTMLCanvasElement | null = null;
+  private textCtx: CanvasRenderingContext2D | null = null;
 
   initPosition(x: number, y: number): void {
     this._playerX.set(x);
@@ -118,13 +120,26 @@ export class GameEngineService implements OnDestroy {
       .filter((p) => p.alpha > 0);
   }
 
-  start(canvas: HTMLCanvasElement, x = SPAWN_X, y = SPAWN_Y): void {
+  start(canvas: HTMLCanvasElement, textCanvas: HTMLCanvasElement, x = SPAWN_X, y = SPAWN_Y): void {
     if (!isPlatformBrowser(this.platformId)) return;
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d')!;
+    this.textCanvas = textCanvas;
+    this.textCtx = textCanvas.getContext('2d')!;
+    this.resize(textCanvas);
     this.initPosition(x, y);
     this.buildOffscreen();
     this.rafId = requestAnimationFrame((t) => this.loop(t, t));
+  }
+
+  resize(textCanvas: HTMLCanvasElement): void {
+    const dpr = window.devicePixelRatio || 1;
+    const w = textCanvas.clientWidth;
+    const h = textCanvas.clientHeight;
+    if (w > 0 && h > 0) {
+      textCanvas.width = Math.round(w * dpr);
+      textCanvas.height = Math.round(h * dpr);
+    }
   }
 
   stop(): void {
@@ -164,97 +179,138 @@ export class GameEngineService implements OnDestroy {
     const c = oc.getContext('2d')!;
     this.offscreen = oc;
 
-    // Sky
-    c.fillStyle = '#0d0d1a';
+    const fillPoly = (pts: [number, number][]) => {
+      c.beginPath();
+      c.moveTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]);
+      c.closePath();
+      c.fill();
+    };
+
+    // Sky gradient
+    const skyGrad = c.createLinearGradient(0, 0, 0, CANVAS_H);
+    skyGrad.addColorStop(0, '#05090f');
+    skyGrad.addColorStop(0.55, '#0c1428');
+    skyGrad.addColorStop(1, '#142038');
+    c.fillStyle = skyGrad;
     c.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
     // Stars (static base — twinkling is per-frame)
     c.fillStyle = '#ffffff';
-    for (const [sx, sy] of STAR_POSITIONS) {
-      c.fillRect(sx, sy, 2, 2);
-    }
+    for (const [sx, sy] of STAR_POSITIONS) c.fillRect(sx, sy, 2, 2);
 
-    // Moon
+    // Moon (crescent)
     c.fillStyle = '#fde68a';
     c.fillRect(430, 18, 18, 18);
-    c.fillStyle = '#0d0d1a';
+    c.fillStyle = '#05090f';
     c.globalAlpha = 0.45;
     c.fillRect(434, 18, 10, 18);
     c.globalAlpha = 1;
 
-    // Back mountains (distant, dark navy)
-    const backPeaks: [number, number, number, number, number, number][] = [
-      [0, 190, 70, 85, 150, 190],
-      [110, 190, 200, 70, 290, 190],
-      [260, 190, 360, 80, 440, 190],
-      [380, 190, 460, 95, 480, 190],
-    ];
-    c.fillStyle = '#1a1d3e';
-    for (const [x1, y1, x2, y2, x3, y3] of backPeaks) {
-      c.beginPath();
-      c.moveTo(x1, y1);
-      c.lineTo(x2, y2);
-      c.lineTo(x3, y3);
-      c.fill();
-    }
+    // Distant mountains — 2 depth layers
+    c.fillStyle = '#0b0f22';
+    fillPoly([[0, 192], [62, 92], [124, 192]]);
+    fillPoly([[108, 192], [218, 68], [328, 192]]);
+    fillPoly([[305, 192], [410, 90], [480, 192]]);
 
-    // Snow caps on back mountains
-    c.fillStyle = '#c7d2fe';
-    c.globalAlpha = 0.5;
-    const caps: [number, number, number, number, number, number][] = [
-      [63, 93, 70, 85, 77, 93],
-      [193, 78, 200, 70, 207, 78],
-      [353, 88, 360, 80, 367, 88],
-    ];
-    for (const [x1, y1, x2, y2, x3, y3] of caps) {
-      c.beginPath();
-      c.moveTo(x1, y1);
-      c.lineTo(x2, y2);
-      c.lineTo(x3, y3);
-      c.fill();
-    }
+    c.fillStyle = '#111530';
+    fillPoly([[25, 196], [130, 106], [228, 196]]);
+    fillPoly([[188, 196], [302, 76], [418, 196]]);
+
+    // Snow caps on far peaks
+    c.fillStyle = '#9ab4e0';
+    c.globalAlpha = 0.22;
+    fillPoly([[56, 100], [62, 92], [68, 100]]);
+    fillPoly([[212, 76], [218, 68], [224, 76]]);
+    fillPoly([[404, 98], [410, 90], [416, 98]]);
     c.globalAlpha = 1;
 
-    // Main massif (3 overlapping polygons)
-    const massif: [number, number, number, number, number, number][] = [
-      [60, 320, 160, 110, 360, 320],
-      [200, 320, 310, 100, 420, 320],
-      [280, 320, 380, 120, 480, 320],
+    // Main mountain — single shape, summit at y=22 (above all refuges)
+    // Verified: all refuge/trail coords fall inside this polygon
+    const mtn: [number, number][] = [
+      [0, CANVAS_H], [480, CANVAS_H],
+      [480, 112], [438, 65], [395, 42],
+      [365, 22],
+      [310, 45], [250, 60],
+      [200, 105], [140, 192], [78, 185],
+      [45, 252], [0, 272],
     ];
-    const massifColors = ['#2a2d55', '#252850', '#2a2d55'];
-    for (let i = 0; i < massif.length; i++) {
-      const [x1, y1, x2, y2, x3, y3] = massif[i];
-      c.fillStyle = massifColors[i];
-      c.beginPath();
-      c.moveTo(x1, y1);
-      c.lineTo(x2, y2);
-      c.lineTo(x3, y3);
-      c.fill();
-    }
 
-    // Village foreground hill + ground
-    c.fillStyle = '#14532d';
+    // Base fill
+    c.fillStyle = '#1a1f4c';
+    fillPoly(mtn);
+
+    // 3D ridge effect — diagonal stripes clipped to mountain silhouette
+    c.save();
     c.beginPath();
-    c.moveTo(0, 280);
-    c.lineTo(80, 220);
-    c.lineTo(160, 280);
+    c.moveTo(mtn[0][0], mtn[0][1]);
+    for (const [mx, my] of mtn.slice(1)) c.lineTo(mx, my);
+    c.closePath();
+    c.clip();
+
+    c.strokeStyle = '#252b65';
+    c.lineWidth = 1.5;
+    c.globalAlpha = 0.55;
+    for (let t = -CANVAS_H; t < CANVAS_W + CANVAS_H; t += 11) {
+      c.beginPath();
+      c.moveTo(t, CANVAS_H);
+      c.lineTo(t + 256, 0);
+      c.stroke();
+    }
+    c.strokeStyle = '#323c80';
+    c.lineWidth = 0.8;
+    c.globalAlpha = 0.3;
+    for (let t = -CANVAS_H; t < CANVAS_W + CANVAS_H; t += 11) {
+      c.beginPath();
+      c.moveTo(t + 4, CANVAS_H);
+      c.lineTo(t + 260, 0);
+      c.stroke();
+    }
+    c.globalAlpha = 1;
+    c.restore();
+
+    // Shadow — steep right cliff face
+    c.fillStyle = '#0e1230';
+    c.globalAlpha = 0.68;
+    fillPoly([
+      [365, 22], [395, 42], [438, 65], [480, 112], [480, 300],
+      [450, 300], [428, 248], [405, 195], [388, 148], [372, 102], [362, 60],
+    ]);
+    c.globalAlpha = 1;
+
+    // Snow cap
+    c.fillStyle = '#b2caf0';
+    c.globalAlpha = 0.72;
+    fillPoly([[365, 22], [395, 42], [380, 52], [350, 46], [320, 54], [330, 40]]);
+    c.fillStyle = '#dae8ff';
+    c.globalAlpha = 0.65;
+    fillPoly([[365, 22], [372, 30], [365, 36], [358, 30]]);
+    c.globalAlpha = 1;
+
+    // Foreground ground
+    c.fillStyle = '#0c2c12';
+    c.beginPath();
+    c.moveTo(0, CANVAS_H);
+    c.lineTo(0, 272);
+    c.lineTo(40, 260);
+    c.lineTo(88, 264);
+    c.lineTo(155, 276);
+    c.lineTo(CANVAS_W, 280);
+    c.lineTo(CANVAS_W, CANVAS_H);
+    c.closePath();
     c.fill();
-    c.fillStyle = '#166534';
-    c.fillRect(0, 280, CANVAS_W, 20);
-    c.fillStyle = '#15803d';
-    c.fillRect(0, 290, CANVAS_W, 10);
+    c.fillStyle = '#144820';
+    c.fillRect(0, 285, CANVAS_W, 15);
+    c.fillStyle = '#1a5c28';
+    c.fillRect(0, 292, CANVAS_W, 8);
 
     // Trail
     this.drawTrailOnCanvas(c);
 
-    // Virage dots
+    // Virage turn markers
     c.fillStyle = '#c9b458';
     for (const [px, py] of [
-      [180, 240],
-      [90, 195],
-      [310, 148],
-      [330, 95],
-      [250, 72],
+      [180, 240], [90, 195], [310, 148], [330, 95], [250, 72],
     ] as [number, number][]) {
       c.beginPath();
       c.arc(px, py, 4, 0, Math.PI * 2);
@@ -266,7 +322,7 @@ export class GameEngineService implements OnDestroy {
     c.beginPath();
     c.arc(230, 168, 6, 0, Math.PI * 2);
     c.fill();
-    c.fillStyle = '#0d0d1a';
+    c.fillStyle = '#080d1c';
     c.beginPath();
     c.arc(230, 168, 3, 0, Math.PI * 2);
     c.fill();
@@ -278,13 +334,11 @@ export class GameEngineService implements OnDestroy {
     for (const ref of REFUGES) this.drawRefugeBuilding(c, ref.x, ref.y, ref.id === 'skills');
 
     // Decorative trees
-    const trees: [number, number][] = [
-      [20, 268],
-      [155, 252],
-      [100, 215],
-      [290, 152],
-    ];
-    for (const [tx, ty] of trees) this.drawTree(c, tx, ty);
+    for (const [tx, ty] of [
+      [20, 268], [155, 252], [100, 215], [290, 152],
+    ] as [number, number][]) {
+      this.drawTree(c, tx, ty);
+    }
   }
 
   private drawTrailOnCanvas(c: CanvasRenderingContext2D): void {
@@ -342,26 +396,26 @@ export class GameEngineService implements OnDestroy {
     c.globalAlpha = 1;
   }
 
+  private signpostPanelW(panel: { label: string; distance: string }): number {
+    const fullLen = (panel.label.length + panel.distance.length + 4) * 3;
+    return Math.min(Math.max(fullLen + 12, 36), 100);
+  }
+
   private drawSignpost(c: CanvasRenderingContext2D, sp: Signpost): void {
     const postH = 14 + sp.panels.length * 12;
-    // Post
     c.fillStyle = '#92400e';
     c.fillRect(sp.x, sp.y, 3, postH);
 
     for (let i = 0; i < sp.panels.length; i++) {
       const panel = sp.panels[i];
       const py = sp.y + 14 + i * 12;
-      const panelW = Math.min(panel.label.length * 4.5 + 16, 90);
+      const panelW = this.signpostPanelW(panel);
       const panelX = panel.direction.includes('left') ? sp.x - panelW + 3 : sp.x + 3;
       c.fillStyle = '#d97706';
       c.fillRect(panelX, py, panelW, 10);
       c.fillStyle = '#b45309';
       c.fillRect(panelX + 1, py + 1, panelW - 2, 8);
-      c.fillStyle = '#fef3c7';
-      c.font = '4px monospace';
-      c.textAlign = 'left';
-      const arrow = panel.direction.includes('left') ? '← ' : '→ ';
-      c.fillText(`${arrow}${panel.label} ${panel.distance}`, panelX + 3, py + 7);
+      // Text drawn on high-DPI text layer
     }
   }
 
@@ -397,27 +451,109 @@ export class GameEngineService implements OnDestroy {
     }
     c.globalAlpha = 1;
 
-    // Layer 4: refuge labels
-    c.font = 'bold 5px monospace';
-    c.textAlign = 'center';
-    for (const ref of REFUGES) {
-      c.fillStyle = '#1e1b4b';
-      c.globalAlpha = 0.9;
-      c.fillRect(ref.x - 20, ref.y + 2, 40, 8);
-      c.globalAlpha = 1;
-      c.fillStyle = '#a5b4fc';
-      c.fillText(ref.label, ref.x, ref.y + 9);
-    }
-
-    // Layer 5: player
+    // Layer 4: player
     this.drawPlayer(c);
 
-    // Layer 6: speech bubble
+    // Layer 5: crisp text overlay (labels, signposts, bubble)
+    this.drawTextLayer();
+  }
+
+  private drawTextLayer(): void {
+    if (!this.textCtx || !this.textCanvas) return;
+    const tc = this.textCtx;
+    const { width: tw, height: th } = this.textCanvas;
+    if (tw === 0 || th === 0) return;
+
+    tc.clearRect(0, 0, tw, th);
+    tc.save();
+    // Scale so logical coords (0–480, 0–300) map to native display pixels
+    tc.scale(tw / CANVAS_W, th / CANVAS_H);
+
+    // Refuge labels
+    tc.textAlign = 'center';
+    tc.font = 'bold 5px "IM Fell English", "Georgia", serif';
+    for (const ref of REFUGES) {
+      const lw = tc.measureText(ref.label).width + 12;
+      tc.fillStyle = '#1e1b4b';
+      tc.globalAlpha = 0.88;
+      tc.fillRect(ref.x - lw / 2, ref.y + 2, lw, 9);
+      tc.globalAlpha = 1;
+      tc.fillStyle = '#a5b4fc';
+      tc.fillText(ref.label, ref.x, ref.y + 9);
+    }
+
+    // Signpost panel text (arrow at far tip, away from post)
+    tc.font = 'italic 4px "IM Fell English", "Georgia", serif';
+    for (const sp of SIGNPOSTS) {
+      for (let i = 0; i < sp.panels.length; i++) {
+        const panel = sp.panels[i];
+        const py = sp.y + 14 + i * 12;
+        const panelW = this.signpostPanelW(panel);
+        const isLeft = panel.direction.includes('left');
+        const panelX = isLeft ? sp.x - panelW + 3 : sp.x + 3;
+        const dist = panel.distance ? ` ${panel.distance}` : '';
+        tc.fillStyle = '#fef3c7';
+        if (isLeft) {
+          // Arrow at left (far) tip, text left-aligned
+          tc.textAlign = 'left';
+          tc.fillText(`← ${panel.label}${dist}`, panelX + 3, py + 7);
+        } else {
+          // Arrow at right (far) tip, text right-aligned
+          tc.textAlign = 'right';
+          tc.fillText(`${panel.label}${dist} →`, panelX + panelW - 3, py + 7);
+        }
+      }
+    }
+
+    // Speech bubble
     const scale = this.bubbleScale();
     const refuge = this.nearbyRefuge();
     if (scale > 0.05 && refuge) {
-      this.drawBubble(c, refuge, scale);
+      this.drawBubbleOnTextLayer(tc, refuge, scale);
     }
+
+    tc.restore();
+  }
+
+  private drawBubbleOnTextLayer(tc: CanvasRenderingContext2D, refuge: Refuge, scale: number): void {
+    const bw = 120;
+    const bh = 44;
+    const bx = refuge.x;
+    const by = Math.max(bh, refuge.y - 30);
+
+    tc.save();
+    tc.translate(bx, by);
+    tc.scale(scale, scale);
+    tc.translate(-bx, -by);
+
+    tc.fillStyle = '#1e293b';
+    tc.strokeStyle = '#6366f1';
+    tc.lineWidth = 1.5;
+    this.drawRoundedRect(tc, bx - bw / 2, by - bh, bw, bh, 5);
+    tc.fill();
+    tc.stroke();
+
+    tc.fillStyle = '#1e293b';
+    tc.beginPath();
+    tc.moveTo(bx - 5, by);
+    tc.lineTo(bx + 5, by);
+    tc.lineTo(bx, by + 6);
+    tc.fill();
+    tc.strokeStyle = '#6366f1';
+    tc.stroke();
+
+    tc.textAlign = 'center';
+    tc.font = 'bold 6px "IM Fell English", "Georgia", serif';
+    tc.fillStyle = '#a5b4fc';
+    tc.fillText(`⛺ ${refuge.label}`, bx, by - bh + 12);
+    tc.font = '4.5px "IM Fell English", "Georgia", serif';
+    tc.fillStyle = '#94a3b8';
+    tc.fillText(refuge.stat, bx, by - bh + 22);
+    tc.fillStyle = '#818cf8';
+    tc.font = 'bold 4.5px "IM Fell English", "Georgia", serif';
+    tc.fillText('[ ESPACE ]  entrer', bx, by - bh + 34);
+
+    tc.restore();
   }
 
   private drawPlayer(c: CanvasRenderingContext2D): void {
@@ -466,50 +602,6 @@ export class GameEngineService implements OnDestroy {
     const poleWobble = isMoving ? 0 : Math.sin(this.time * 2) * 1;
     c.fillRect(px - 2, py + 13 + poleWobble, 2, 9);
     c.fillRect(px + PLAYER_W, py + 13 - poleWobble, 2, 9);
-
-    c.restore();
-  }
-
-  private drawBubble(c: CanvasRenderingContext2D, refuge: Refuge, scale: number): void {
-    const bx = refuge.x;
-    const w = 110;
-    const h = 38;
-    const by = Math.max(h, refuge.y - 30);
-
-    c.save();
-    c.translate(bx, by);
-    c.scale(scale, scale);
-    c.translate(-bx, -by);
-
-    // Bubble background
-    c.fillStyle = '#1e293b';
-    c.strokeStyle = '#6366f1';
-    c.lineWidth = 1.5;
-    this.drawRoundedRect(c, bx - w / 2, by - h, w, h, 5);
-    c.fill();
-    c.stroke();
-
-    // Pointer triangle
-    c.fillStyle = '#1e293b';
-    c.beginPath();
-    c.moveTo(bx - 5, by);
-    c.lineTo(bx + 5, by);
-    c.lineTo(bx, by + 6);
-    c.fill();
-    c.strokeStyle = '#6366f1';
-    c.stroke();
-
-    // Text
-    c.textAlign = 'center';
-    c.font = 'bold 5px monospace';
-    c.fillStyle = '#a5b4fc';
-    c.fillText(`📋 ${refuge.label}`, bx, by - h + 10);
-    c.font = '4px monospace';
-    c.fillStyle = '#94a3b8';
-    c.fillText(refuge.stat, bx, by - h + 20);
-    c.fillStyle = '#6366f1';
-    c.font = 'bold 4px monospace';
-    c.fillText('[ ESPACE ] entrer', bx, by - h + 31);
 
     c.restore();
   }

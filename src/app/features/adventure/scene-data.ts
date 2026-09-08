@@ -83,7 +83,7 @@ export const SIGNPOSTS: readonly Signpost[] = [
     x: 230,
     y: 168,
     panels: [
-      { direction: 'up-right', label: 'Expériences / Projets / Compétences', distance: '→' },
+      { direction: 'up-right', label: 'Vers le sommet', distance: '' },
       { direction: 'down-left', label: 'Contact', distance: '~80m' },
     ],
   },
